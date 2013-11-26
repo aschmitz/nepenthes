@@ -1,0 +1,157 @@
+<div class="page-header">
+  <h1>Home</h1>
+</div>
+
+<p>
+  Nepenthes is currently tracking <strong><%= pluralize IpAddress.count, 'host' %></strong>
+  with <strong><%= pluralize Port.count, 'open port' %></strong> known.
+  There are currently <strong><%= pluralize (Sidekiq::Workers.new.size), 'busy worker' %></strong>.
+</p>
+
+<table class="table table-striped table-condensed table-nonfluid">
+  <tr>
+    <th>Queue</th>
+    <th>Details</th>
+  </tr>
+  <%
+    queue_length = {}
+    [['lomem_slow', 'Low-memory, slow'],
+     ['lomem_fast', 'Low-memory, fast'],
+     ['himem_slow', 'High-memory, slow'],
+     ['himem_fast', 'High-memory, fast'],
+     ['results', 'Results']].each do |queue_name, desc|
+      queue = Sidekiq::Queue.new(queue_name)
+      queue_length[queue_name] = queue.size %>
+  <tr>
+    <th><%= desc %></th>
+    <td>
+      <% if queue_length[queue_name].zero? %>
+      Empty
+      <% else %>
+        <%= pluralize queue_length[queue_name], 'queued job' %>,
+        dating back to <%= time_ago_in_words (queue.latency).ago %> ago.
+      <% end %>
+    </td>
+  </tr>
+  <% end %>
+</table>
+
+<h2>Actions</h2>
+<p>The actions listed below are not all that can be done in Nepenthes. Check out the readme or look at the models to see what else can be done. You may also benefit from pulling up a Rails console to perform your own queries.</p>
+
+<p>Actions listed here are disabled if they make little sense. They are also colored by their impact on worker resources and length of time to complete.</p>
+<p><span class="btn btn-mini" disabled>Uncolored</span> actions take you elsewhere and don't perform an action immediately.</p>
+<p><span class="btn btn-mini btn-success" disabled>Green</span> actions should complete quickly.</p>
+<p><span class="btn btn-mini btn-warning" disabled>Yellow</span> actions may take a few minutes (or longer for large numbers of hosts).</p>
+<p><span class="btn btn-mini btn-danger" disabled>Red</span> actions may take hours, depending on the number of hosts or ports you scan.</p>
+
+<h3>IP Addresses</h3>
+<%
+total_addresses = IpAddress.count
+missing_scan = IpAddress.includes(:scans).where(:scans => {:ip_address_id => nil}).count
+missing_full = IpAddress.where(has_full_scan: false).count
+%>
+<table class="table table-striped table-nonfluid">
+  <tr>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+  <tr>
+    <td>
+      <%= pluralize total_addresses, 'IP address' %> total
+    </td>
+    <td>
+      <%= link_to 'Add More',
+        batch_ip_addresses_path,
+        class: 'btn btn-mini' %>
+      <%= link_to_unless total_addresses.zero?,
+        content_tag(:span,
+          'Remove Some',
+          class: 'btn btn-mini',
+            disabled: total_addresses.zero?),
+        batch_ip_addresses_path(:type => 'delete') %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_scan %> without scheduled scans
+    </td>
+    <td>
+      <%= button_to 'Queue Quick Scans',
+        {:action => 'action', :id => 'ipaddress_quick'},
+        class: 'btn btn-mini btn-warning',
+        disabled: missing_scan.zero? %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_full %> without full scan results
+    </td>
+    <td>
+      <%= button_to 'Queue Full Scans',
+        {:action => 'action', :id => 'ipaddress_full'},
+        class: 'btn btn-mini btn-danger',
+        disabled: missing_full.zero?,
+        confirm: queue_length['lomem_slow'].zero? ? false : "Are you sure? There are #{pluralize queue_length['lomem_slow'], 'job'} in the queue, which may include full scans." %>
+    </td>
+  </tr>
+</table>
+
+<h3>Ports</h3>
+<%
+missing_hostname = IpAddress.not_hostname_checked.count
+missing_ssl = Port.not_ssl_checked.count
+missing_screenshots = Port.not_screenshotted.count
+missing_nikto = Port.not_nikto_scanned.count
+%>
+<table class="table table-striped table-nonfluid">
+  <tr>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_hostname %> without hostnames checked
+    </td>
+    <td>
+      <%= button_to 'Queue Hostname Checks',
+        {:action => 'action', :id => 'ipaddress_hostname'},
+        class: 'btn btn-mini btn-success',
+        disabled: missing_hostname.zero? %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_ssl %> without SSL checked
+    </td>
+    <td>
+      <%= button_to 'Queue SSL Checks',
+        {:action => 'action', :id => 'port_ssl'},
+        class: 'btn btn-mini btn-success',
+        disabled: missing_ssl.zero? %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_screenshots %> without <%= link_to 'screenshot', screenshots_path %> attempts
+    </td>
+    <td>
+      <%= button_to 'Queue Screenshots',
+        {:action => 'action', :id => 'port_screenshot'},
+        class: 'btn btn-mini btn-warning',
+        disabled: missing_screenshots.zero?,
+        confirm: (missing_ssl.zero? ? false : 'Are you sure? You might want to wait until the SSL checks are done for best results.') %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_nikto %> without Nikto scans
+    </td>
+    <td>
+      <%= button_to 'Queue Nikto Scans',
+        {:action => 'action', :id => 'port_nikto'},
+        class: 'btn btn-mini btn-danger',
+        disabled: missing_nikto.zero? %>
+    </td>
+  </tr>
+</table>

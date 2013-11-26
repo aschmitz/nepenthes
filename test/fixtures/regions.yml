@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  utc_start_test: 1.5
+  utc_end_test: 1.5
+
+two:
+  name: MyString
+  utc_start_test: 1.5
+  utc_end_test: 1.5

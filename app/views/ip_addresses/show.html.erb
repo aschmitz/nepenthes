@@ -1,0 +1,36 @@
+<%- model_class = IpAddress -%>
+<div class="page-header">
+  <h1><%= @ip_address.address_and_hostname %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:tags) %>:</strong></dt>
+  <dd>
+    <% if @ip_address.tags.any? %>
+      <% @ip_address.tags.each do |tag| %>
+        <%= link_to tag.name, tagged_ip_addresses_url(:tag => tag.name) %>
+      <% end %>
+    <% end %>
+  </dd>
+  <dt><strong><%= model_class.human_attribute_name(:region_id) %>:</strong></dt>
+  <dd><%= @ip_address.region.name %></dd>
+</dl>
+
+<h2>Open ports</h2>
+<% if @ip_address.ports.any? %>
+  <%= render partial: 'ports/ports', object: @ip_address.ports, locals: {show: :port} %>
+<% else %>
+  No open ports found (yet)!
+<% end %>
+
+<div class="form-actions">
+  <%= link_to t('.back', :default => t("helpers.links.back")),
+              ip_addresses_path, :class => 'btn'  %>
+  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_ip_address_path(@ip_address), :class => 'btn' %>
+  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              ip_address_path(@ip_address),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>
+</div>

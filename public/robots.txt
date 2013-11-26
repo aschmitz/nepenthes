@@ -1,0 +1,3 @@
+# We dont' really need anybody spidering this.
+User-Agent: *
+Disallow: /

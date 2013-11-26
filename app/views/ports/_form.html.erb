@@ -1,0 +1,32 @@
+<%= form_for @port, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :number, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :number, :class => 'text_field', :disabled => "disabled" %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :ip_address, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :ip_address, :class => 'text_field', :disabled => "disabled" %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :notes, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_area :notes, :class => 'text_area' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :done, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.check_box :done, :class => 'check_box' %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                port_path, :class => 'btn' %>
+  </div>
+<% end %>

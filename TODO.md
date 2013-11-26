@@ -1,0 +1,3 @@
+* We should have a facility for detecting HTTP servers like we do for SSL servers. This would be useful for Nikto, as well as potentially for other services.
+
+* Full support for domain names would also be useful. For example, Nikto scans could be run on domains rather than ports. SSL scan results could be used to add domain names. We could look up IP addresses for given domains, and add those. We could brute-force subdomains (admin.client.com) and see which ones exist.

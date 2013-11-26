@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  address: MyString
+  tags: MyString
+  region: 
+  tag: 
+
+two:
+  address: MyString
+  tags: MyString
+  region: 
+  tag: 

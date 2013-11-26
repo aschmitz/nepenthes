@@ -1,0 +1,62 @@
+<%- model_class = IpAddress -%>
+<div class="page-header">
+  <h1>Hosts<%= params[:tag] ? " tagged \"#{params[:tag]}\"" : '' %></h1>
+</div>
+
+<%= form_tag search_ip_addresses_path, :class => 'form-horizontal' do %>
+  <div class="control-group">
+    <%= label_tag :q, 'Search for IP Address', :class => 'control-label' %>
+    <div class="controls">
+      <%= text_field_tag :q, '', :class => 'text_field' %>
+      <%= submit_tag nil, :class => 'btn btn-primary' %>
+    </div>
+  </div>
+<% end %>
+
+<%= paginate @ip_addresses %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:address) %></th>
+      <th>Tags</th>
+      <th>Open Ports</th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @ip_addresses.each do |ip_address| %>
+      <tr>
+        <td><%= link_to ip_address.address_and_hostname, ip_address_path(ip_address) %></td>
+        <td>
+          <% if ip_address.tags.any? %>
+            <% ip_address.tags.each do |tag| %>
+              <%= link_to tag.name, tagged_ip_addresses_url(:tag => tag_escape(tag.name)) %>
+            <% end %>
+          <% end %>
+        </td>
+        <td>
+          <%= ip_address.ports.count %>
+        </td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_ip_address_path(ip_address), :class => 'btn btn-mini' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      ip_address_path(ip_address),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-mini btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= paginate @ip_addresses %>
+
+<%= link_to 'Bulk Add',
+            batch_ip_addresses_path,
+            :class => 'btn' %>
+
+<%= link_to 'Bulk Delete',
+            batch_ip_addresses_path(:type => 'delete'),
+            :class => 'btn btn-danger' %>

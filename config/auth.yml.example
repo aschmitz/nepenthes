@@ -1,0 +1,3 @@
+username: changeme
+password: changeme
+changed: false # Change this to true when you set a password.

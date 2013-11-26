@@ -1,0 +1,51 @@
+<tr>
+  <td>
+    <% if show == :port %>
+      <%= link_to port.number, port_path(port.number) %>
+    <% elsif show == :address %>
+      <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>
+    <% else %>
+      <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>:<%= link_to port.number, port_path(port.number) %>
+    <% end %>
+  </td>
+  <td>
+    <% if port.ssl == nil %>
+      <a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>
+      <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
+    <% elsif port.ssl == false %>
+      <a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>
+    <% else %>
+      <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
+    <% end %>
+  </td>
+  <td>
+    <% if port.ip_address.tags.any? %>
+      <% port.ip_address.tags.each do |tag| %>
+        <%= link_to tag.name, tagged_ip_addresses_url(:tag => tag_escape(tag.name)) %>
+      <% end %>
+    <% end %>
+  </td>
+  <td>
+    <% if port.product %>
+      <%= link_to port.product_str, tagged_ports_url(tag_escape(port.product)) %>
+    <% end %>
+  </td>
+  <td>
+    <%= port.extra %>
+    <% unless port.screenshots.where('length(data) > 0').empty?
+      ss = port.screenshots.where('length(data) > 0').first %><br>
+      <%= link_to (image_tag screenshot_path(ss.id), width: 200, height: 150), ss.url, target: '_blank' %>
+    <% end %>
+  </td>
+  <td><%= simple_format(h(port.notes)) %></td>
+  <td><%= simple_format(h(port.nikto_results)) %></td>
+  <td><%= port.done %></td>
+  <td>
+    <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                edit_port_path(port), :class => 'btn btn-mini' %>
+    <%= link_to t('.note', :default => t("helpers.links.done")),
+                mark_as_done_port_path(port, :todo => params[:todo] ), :class => 'btn btn-mini', :method => :post %>
+    <div class='btn btn-mini add-note' onclick="show_notes_dialog(<%= port.id %>)" >Quick Update
+      </div>
+  </td>
+</tr>

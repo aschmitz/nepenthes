@@ -1,0 +1,26 @@
+<%= form_for @region, :html => { :class => 'form-horizontal' } do |f| %>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :utc_start_test, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :utc_start_test, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :utc_end_test, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :utc_end_test, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                regions_path, :class => 'btn' %>
+  </div>
+<% end %>

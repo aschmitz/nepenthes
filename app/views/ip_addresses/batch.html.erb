@@ -1,0 +1,27 @@
+<h1><%= @title %></h1>
+<%= form_tag @action, :class => 'form-horizontal' do %>
+  <div class="control-group">
+    <%= label_tag :addresses, 'IP Addresses', :class => 'control-label' %>
+    <div class="controls">
+      <%= text_area_tag :addresses, '', :class => 'text_area', :rows => 7 %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label_tag :tags, 'Tags', :class => 'control-label' %>
+    <div class="controls">
+      <%= text_field_tag :tags, '', :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= label_tag :region_id, 'Region', :class => 'control-label' %>
+    <div class="controls">
+      <%= select_tag :region_id, options_from_collection_for_select(@regions, "id", "name", @region_id), :class => 'number_field' %>
+    </div>
+  </div>
+  
+  <div class="form-actions">
+    <%= submit_tag nil, :class => 'btn btn-primary' %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                ip_addresses_path, :class => 'btn' %>
+  </div>
+<% end %>

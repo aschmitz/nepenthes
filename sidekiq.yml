@@ -1,0 +1,7 @@
+---
+:verbose: true
+:concurrency:  150
+:pidfile: ./tmp/pids/sidekiq.pid
+:queues:
+  - [scans, 5]
+  - [fullscans, 1]
