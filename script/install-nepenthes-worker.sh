@@ -53,7 +53,7 @@ else
 fi
 
 echo -e "\n[*] Checking multiverse availability"
-grep '^\s*deb.*multiverse' /etc/apt/sources.list
+grep -q '^\s*deb.*multiverse' /etc/apt/sources.list
 if [ $? -ne 0 ]; then
   echo "No multiverse, backing up /etc/apt/sources.list and adding it."
   cp /etc/apt/sources.list /etc/apt/sources.list.pre-nepenthes
