@@ -91,3 +91,6 @@ gem install --no-rdoc --no-ri bundler
 
 echo -e "\n[*] Installing Nepenthes' required gems"
 bundle install --without local
+
+echo -e "\n[*] Dropping Nepenthes worker scripts in ~/"
+cp scripts/*worker*.sh ~/
