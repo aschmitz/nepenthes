@@ -15,15 +15,15 @@ ActiveRecord::Schema.define(version: 20131125221449) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "ip_addresses", force: true do |t|
     t.integer  "region_id"
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "address",                          default: 0,     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "address",       limit: 8,          default: 0
     t.text     "settings",      limit: 2147483647
     t.boolean  "has_full_scan",                    default: false
     t.string   "hostname"
@@ -39,8 +39,8 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.string   "product"
     t.string   "version"
     t.text     "extra"
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "notes"
     t.boolean  "done"
     t.text     "settings",      limit: 2147483647
@@ -59,15 +59,15 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.string   "name"
     t.float    "utc_start_test"
     t.float    "utc_end_test"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "scans", force: true do |t|
     t.integer  "ip_address_id"
     t.text     "results",       limit: 2147483647
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.text     "options"
     t.boolean  "processed",                        default: false, null: false
   end
@@ -79,8 +79,8 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.binary   "data",                limit: 16777215
     t.integer  "screenshotable_id"
     t.string   "screenshotable_type"
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "taggings", force: true do |t|
