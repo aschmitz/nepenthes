@@ -16,7 +16,7 @@
 * `rake db:migrate`
 * If you're not already running Redis, run it. (`redis-server` in a new terminal window is fine, as is running it as a daemon.) Be warned that Redis listens on all interfaces by default. Nepenthes only needs to access it via localhost, so feel free to lock down Redis' configuration.
 * `rails s`
-* In another terminal window on your local computer, run `sidekiq -c 1 -r . -q results -v`. (If you are using SQLite, you *must not* use more than one thread here. Other databases can use more, but it won't help much: this isn't a very slow step.)
+* In another terminal window on your local computer, run `sidekiq -c 4 -r . -q results -v`. (If you are using SQLite, you *must not* use more than one thread here. Other databases can use more, but it won't help much: this isn't a very slow step.)
 * Visit http://localhost:3000/regions
 
 If you want to run Nepenthes workers locally:
@@ -65,7 +65,7 @@ Once your scans are done:
 
 * To check whether ports are using *SSL* or not: `Port.check_all_ssl!`.
 * To get *screenshots* of applicable webpages (including on all ports), do `Port.take_all_screenshots!`. This is on the `screenshot` queue, and requires PhantomJS on the worker. (Packages exist in most OS's package managers, any recent version is fine.) `sidekiq -c [number of threads] -r . -q screenshot -v` will get it running.
-* To process the results, you'll want to keep a results processor going. `sidekiq -c 1 -r . -q results -v` if you didn't still have it running.
+* To process the results, you'll want to keep a results processor going. `sidekiq -c 4 -r . -q results -v` if you didn't still have it running.
 
 ## Results
 
