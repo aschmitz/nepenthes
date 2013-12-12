@@ -63,11 +63,10 @@ grep -q '^\s*deb.*multiverse' /etc/apt/sources.list
 if [ $? -ne 0 ]; then
   echo "No multiverse, backing up /etc/apt/sources.list and adding it."
   cp /etc/apt/sources.list /etc/apt/sources.list.pre-nepenthes
-  echo "deb http://archive.ubuntu.com/ubuntu `lsb_release -c -s` multiverse" \
-    >> /etc/apt.sources.list
+  echo "deb http://archive.ubuntu.com/ubuntu `lsb_release -c -s`" \
+    "multiverse" >> /etc/apt.sources.list
   echo -n "deb http://archive.ubuntu.com/ubuntu `lsb_release -c -s`-updates" \
-    >> /etc/apt.sources.list
-  echo " multiverse" >> /etc/apt/sources.list
+    "multiverse" >> /etc/apt.sources.list
 else
   echo "Multiverse appears to be enabled."
 fi
