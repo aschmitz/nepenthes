@@ -36,9 +36,15 @@ UBUNTU_VERSION=`lsb_release -r -s`
 
 if [ $UBUNTU_VERSION \< "12.10" ]; then
   echo -e "\n[*] Using Ubuntu < 12.10, downloading PhantomJS separately."
+  arch=`uname -m`
+  if [[ $arch == "x86_64" ]]; then
+    phantomjshash=c78c4037d98fa893e66fc516214499c58228d2f9
+  else
+    phantomjshash=9ead5dd275f79eaced61ce63dbeca58be4d7f090
+  fi
   wget -O phantomjs.tar.bz2 \
-    https://phantomjs.googlecode.com/files/phantomjs-1.9.2-linux-i686.tar.bz2
-  sha1sum phantomjs.tar.bz2 | grep -q 9ead5dd275f79eaced61ce63dbeca58be4d7f090
+    https://phantomjs.googlecode.com/files/phantomjs-1.9.2-linux-$arch.tar.bz2
+  sha1sum phantomjs.tar.bz2 | grep -q $phantomjshash
   if [ $? -ne 0 ]; then
     echo "Unexpected PhantomJS SHA-1 hash. Please try again."
     exit 1
