@@ -2,10 +2,15 @@
   <h1>Home</h1>
 </div>
 
+<%
+hosts = IpAddress.count
+open_ports = Port.count
+busy_workers = Sidekiq::Workers.new.size
+%>
 <p>
-  Nepenthes is currently tracking <strong><%= pluralize IpAddress.count, 'host' %></strong>
-  with <strong><%= pluralize Port.count, 'open port' %></strong> known.
-  There are currently <strong><%= pluralize (Sidekiq::Workers.new.size), 'busy worker' %></strong>.
+  Nepenthes is currently tracking <strong><%= pluralize hosts, 'host' %></strong>
+  with <strong><%= pluralize open_ports, 'open port' %></strong> known.
+  There <%= busy_workers == 1 ? 'is' : 'are' %> currently <strong><%= pluralize busy_workers, 'busy worker' %></strong>.
 </p>
 
 <table class="table table-striped table-condensed table-nonfluid">
