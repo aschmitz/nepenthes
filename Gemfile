@@ -42,4 +42,7 @@ group :local do
   gem 'sass-rails'
   gem 'coffee-rails'
   gem 'uglifier'
+  
+  # Unicorn as a server
+  gem 'unicorn'
 end
