@@ -19,16 +19,6 @@ else
   exit 1
 fi
 
-echo -e "\n[*] Checking for Redis..."
-echo -en "PING\r\n" | nc -w 5 127.0.0.1 6379 | grep -q PONG
-if [ $? -ne 0 ]; then
-  echo "Couldn't detect Redis on localhost." \
-    "Try SSHing to this worker like this:"
-  echo "ssh -R 127.0.0.1:6379:127.0.0.1:6379 [user]@[host]"
-  exit 1
-fi
-echo "Redis works."
-
 PACKAGES="git tmux build-essential libfontconfig1 ruby1.9.1 ruby1.9.1-dev \
   libsqlite3-dev libxslt1-dev nmap nikto"
 
