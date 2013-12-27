@@ -10,7 +10,7 @@ class IpAddress < ActiveRecord::Base
   default_scope { order(:address) }
   
   def address_and_hostname
-    if self.hostname.empty?
+    if self.hostname.nil? || self.hostname.empty?
       self.to_s
     else
       "#{self.to_s} (#{self.hostname})"
