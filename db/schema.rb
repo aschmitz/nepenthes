@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20140129095429) do
     t.text     "settings",      limit: 2147483647
     t.boolean  "ssl"
     t.boolean  "screenshotted",                    default: false
-    t.text     "nikto_results"
+    t.text     "nikto_results", limit: 2147483647
     t.string   "final_url"
   end
 
