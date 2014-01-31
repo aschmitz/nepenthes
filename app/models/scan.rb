@@ -16,6 +16,9 @@ class Scan < ActiveRecord::Base
     ip_address = IpAddress.find_by_dotted(doc.at('host/address/@addr').value)
     empty_ports = []
     have_ports = false
+
+    extrainfo = doc.at('//taskend[@task="SYN Stealth Scan"]/@extrainfo').value
+    self.timed_out = extrainfo =~ /timed out/
     
     doc.xpath('//port').each do |port|
       if port.at('state/@state').value == 'open'

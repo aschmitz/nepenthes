@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 20140129095429) do
     t.datetime "updated_at"
     t.text     "options"
     t.boolean  "processed",                        default: false, null: false
+    t.boolean  "timed_out"
   end
 
   add_index "scans", ["ip_address_id"], name: "index_scans_on_ip_address_id", using: :btree
