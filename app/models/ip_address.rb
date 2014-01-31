@@ -8,6 +8,8 @@ class IpAddress < ActiveRecord::Base
   store :settings, coder: JSON
   
   default_scope { order(:address) }
+
+  scope :with_ports, -> { joins(:ports).distinct }
   
   def address_and_hostname
     if self.hostname.nil? || self.hostname.empty?
