@@ -98,4 +98,26 @@ class IpAddress < ActiveRecord::Base
   def queue_check_hostname!
     Sidekiq::Client.enqueue(HostnameWorker, self.id, self.to_s)
   end
+
+  def has_port x
+    self.ports.where(number: x).any?
+  end
+
+  def port_numbers
+    self.ports.map(&:number)
+  end
+
+  def self.to_csv
+    CSV.generate do |csv|
+      columns = ['host'] + Port::COMMON_PORTS + ['other']
+      csv << columns
+      IpAddress.with_ports.each do |addr|
+        ports = addr.port_numbers
+        commons = Port::COMMON_PORTS.map {|x| 'X' if ports.include? x}
+        others = (ports - Port::COMMON_PORTS).join ', '
+        row = [addr.address_and_hostname] + commons + [others]
+        csv << row
+      end
+    end
+  end
 end

@@ -19,6 +19,9 @@ class Port < ActiveRecord::Base
     8081, 8082,
     3000, 3001, 3002,
   ]
+
+  # used for reporting
+  COMMON_PORTS = [21, 25, 53, 80, 443, 1080, 1443]
   
   def queue_http_title_scan!
     Sidekiq::Client.enqueue(HttpTitleWorker, self.id, self.ip_address.to_s, self.number)

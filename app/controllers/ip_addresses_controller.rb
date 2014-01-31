@@ -151,6 +151,16 @@ class IpAddressesController < ApplicationController
     flash[:success] = "Deleted #{help.pluralize(total_addresses, 'address')}"
     redirect_to batch_ip_addresses_path(:type => 'delete')
   end
+
+  def nate_report
+# we could make COMMON_PORTS a parameter
+    @common_ports = Port::COMMON_PORTS
+    @addresses = IpAddress.with_ports
+    respond_to do |format|
+      format.html
+      format.csv { render text: IpAddress.to_csv }
+    end
+  end
   
 private
   def text_to_ips(addresses)

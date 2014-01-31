@@ -16,6 +16,7 @@ Nepenthes::Application.routes.draw do
       post 'batch_delete'
       post 'search'
       get 'tagged/:tag', :action => 'index', :as => 'tagged'
+      get 'nate_report'
     end
   end
   
