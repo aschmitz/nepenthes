@@ -13,6 +13,9 @@ class HomeController < ApplicationController
     when 'ipaddress_hostname'
       count = IpAddress.queue_hostname_checks!
       flash[:success] = "Queued hostname checks for #{count} hosts."
+    when 'ipaddress_rescan'
+      count = IpAddress.queue_rescans! params[:timeout]
+      flash[:success] = "Re-queued full scans for #{count} hosts."
     when 'port_ssl'
       count = Port.check_all_ssl!
       flash[:success] = "Queued SSL checks for #{count} ports."

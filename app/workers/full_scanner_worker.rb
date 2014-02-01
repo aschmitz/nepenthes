@@ -4,9 +4,9 @@ class FullScannerWorker
   include Sidekiq::Worker
   sidekiq_options :queue => :lomem_slow
   
-  def perform(id, host)
+  def perform(id, host, timeout=30)
     full_options = ['nmap', '-Pn', '-oX', '-', '-p-', '--max-rtt-timeout=500ms',
-      '--max-retries=2', '--host-timeout=30m', '-v', '-sV', '--version-light', host]
+      '--max-retries=2', "--host-timeout=#{timeout}m", '-v', '-sV', '--version-light', host]
     stdout_str, status = Open3.send(:capture2, *full_options)
     if status == 0
       Sidekiq::Client.enqueue(ScannerResults, id, stdout_str, true)

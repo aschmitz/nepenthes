@@ -23,10 +23,11 @@ ActiveRecord::Schema.define(version: 20140129095429) do
     t.integer  "region_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "address",       limit: 8,          default: 0
-    t.text     "settings",      limit: 2147483647
-    t.boolean  "has_full_scan",                    default: false
+    t.integer  "address",             limit: 8,          default: 0
+    t.text     "settings",            limit: 2147483647
+    t.boolean  "has_full_scan",                          default: false
     t.string   "hostname"
+    t.boolean  "full_scan_timed_out"
   end
 
   add_index "ip_addresses", ["address"], name: "index_ip_addresses_on_address", unique: true, using: :btree

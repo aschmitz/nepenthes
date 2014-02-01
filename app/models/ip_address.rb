@@ -58,6 +58,21 @@ class IpAddress < ActiveRecord::Base
     
     queued
   end
+
+  def self.queue_rescans! timeout
+    queued = 0
+    self.where(full_scan_timed_out: true).each do |ip|
+      scan = ip.scans.create
+      ip.full_scan_timed_out = false
+      ip.save!
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s, timeout)
+      queued += 1
+    end
+    # do we want to delete the old scans?
+    # or repurpose them?
+
+    queued
+  end
   
   def self.queue_quick_scans!
     queued = 0
