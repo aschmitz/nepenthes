@@ -8,6 +8,11 @@ class NiktoWorker
     nikto_data, status = Open3.capture2($NIKTO_PATH,
           '-host', "#{host}", '-port', "#{port}", '-C', 'all', ssl ? '-ssl' : '-nossl')
         
-    Sidekiq::Client.enqueue(NiktoResults, id, nikto_data)
+    if status == 0
+      Sidekiq::Client.enqueue(NiktoResults, id, nikto_data)
+    else
+      # nikto didn't finish properly (probably killed), try again later.
+      Sidekiq::Client.enqueue(NiktoWorker, id, host, port, ssl)
+    end
   end
 end
