@@ -5,11 +5,13 @@
 <%
 hosts = IpAddress.count
 open_ports = Port.count
+live_hosts = IpAddress.with_ports.count
 busy_workers = Sidekiq::Workers.new.size
 %>
 <p>
   Nepenthes is currently tracking <strong><%= pluralize hosts, 'host' %></strong>
-  with <strong><%= pluralize open_ports, 'open port' %></strong> known.
+  with <strong><%= pluralize open_ports, 'open port' %></strong> found
+  on <strong><%= pluralize live_hosts, 'host' %></strong>.
   There <%= busy_workers == 1 ? 'is' : 'are' %> currently <strong><%= pluralize busy_workers, 'busy worker' %></strong>.
 </p>
 
