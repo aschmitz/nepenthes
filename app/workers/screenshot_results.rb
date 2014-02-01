@@ -31,6 +31,7 @@ class ScreenshotResults
     end
 
       screenshot.data = image
+      screenshot.data_hash = OpenSSL::Digest::MD5.hexdigest image
       screenshot.save!
     end
   end

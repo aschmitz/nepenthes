@@ -34,6 +34,6 @@ class HomeController < ApplicationController
   
   def screenshots
     @screenshots = Screenshot
-    @screenshots = @screenshots.page(params[:page]).per(100)
+    @screenshots = @screenshots.group('data_hash').page(params[:page]).per(100)
   end
 end

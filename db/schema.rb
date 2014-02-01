@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140129095429) do
+ActiveRecord::Schema.define(version: 20140131065924) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -84,7 +84,10 @@ ActiveRecord::Schema.define(version: 20140129095429) do
     t.string   "screenshotable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "data_hash"
   end
+
+  add_index "screenshots", ["data_hash"], name: "index_screenshots_on_data_hash", using: :btree
 
   create_table "taggings", force: true do |t|
     t.integer  "tag_id"
