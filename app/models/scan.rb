@@ -17,8 +17,8 @@ class Scan < ActiveRecord::Base
     empty_ports = []
     have_ports = false
 
-    extrainfo = doc.at('//taskend[@task="SYN Stealth Scan"]/@extrainfo').value
-    self.timed_out = extrainfo =~ /timed out/
+    extrainfo = doc.at('//taskend[@task="SYN Stealth Scan"]/@extrainfo')
+    self.timed_out = extrainfo && extrainfo.value =~ /timed out/
     
     doc.xpath('//port').each do |port|
       if port.at('state/@state').value == 'open'
