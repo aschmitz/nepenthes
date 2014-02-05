@@ -12,6 +12,7 @@ class FullScannerWorker
       Sidekiq::Client.enqueue(ScannerResults, id, stdout_str, true)
     else
       # nmap didn't finish properly (probably killed), try again later.
+      logger.info { "nmap died, status: #{status}" }
       Sidekiq::Client.enqueue(FullScannerWorker, id, host, timeout)
     end
   end

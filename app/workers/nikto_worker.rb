@@ -12,6 +12,7 @@ class NiktoWorker
       Sidekiq::Client.enqueue(NiktoResults, id, nikto_data)
     else
       # nikto didn't finish properly (probably killed), try again later.
+      logger.info { "nikto died, status: #{status}" }
       Sidekiq::Client.enqueue(NiktoWorker, id, host, port, ssl)
     end
   end
