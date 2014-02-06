@@ -18,7 +18,11 @@ class IpAddress < ActiveRecord::Base
   end
   
   def address_or_hostname
-    self.hostname.empty? ? self.to_s : self.hostname
+    if (self.hostname != nil) and self.hostname.empty?
+      self.to_s
+    else
+      self.hostname
+    end
   end
   
   def to_s
