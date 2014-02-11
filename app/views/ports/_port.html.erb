@@ -45,7 +45,7 @@
                 edit_port_path(port), :class => 'btn btn-mini' %>
     <%= link_to t('.note', :default => t("helpers.links.done")),
                 mark_as_done_port_path(port, :todo => params[:todo] ), :class => 'btn btn-mini', :method => :post %>
-    <div class='btn btn-mini add-note' onclick="show_notes_dialog(<%= port.id %>, '<%= port.notes %>')" >Quick Update
+    <div class='btn btn-mini add-note' onclick="show_notes_dialog(<%= port.id %>, '<%= escape_javascript port.notes  %>')" >Quick Update
       </div>
   </td>
 </tr>
