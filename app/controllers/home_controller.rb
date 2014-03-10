@@ -31,9 +31,4 @@ class HomeController < ApplicationController
     
     redirect_to root_path
   end
-  
-  def screenshots
-    @screenshots = Screenshot
-    @screenshots = @screenshots.group('data_hash').page(params[:page]).per(100)
-  end
 end
