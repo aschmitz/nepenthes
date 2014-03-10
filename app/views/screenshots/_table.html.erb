@@ -1,0 +1,31 @@
+<div id="dialog-form" title="Edit Notes" style="display: none">
+  <form method="post" id="dialog-form-tag">
+   <input name="_method" type="hidden" value="put" />
+    <fieldset>
+      <label for="notes">Notes</label>
+      <textarea name="port[notes]" id="notes" class="text ui-widget-content ui-corner-all" style="width:300px; height:100px" /></textarea>
+      <label for="done">Done</label>
+      <input type="checkbox" name="port[done]" value="true" class="text ui-widget-content ui-corner-all">
+      <input type="hidden" name="todo" value="<%= params[:todo] %>}">
+    </fieldset>
+  </form>
+</div>
+
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+      <th>IP Address</th>
+      <th>Links</th>
+      <th>Final URL</th>
+      <th>Host Tags</th>
+      <th>Product</th>
+      <th>Screenshot</th>
+      <th>Notes</th>
+      <th>Nikto Results</th>
+      <th>Done</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= render partial: 'screenshot', collection: @screenshots %>
+  </tbody>
+</table>

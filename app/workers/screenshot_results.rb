@@ -24,12 +24,7 @@ class ScreenshotResults
     else
       image = Base64.decode64(encoded_image)
 
-    if screenshot.screenshotable.is_a?(Port)
-      port = screenshot.screenshotable
-      port.final_url = final_url
-      port.save!
-    end
-
+      screenshot.final_url = final_url
       screenshot.data = image
       screenshot.data_hash = OpenSSL::Digest::MD5.hexdigest image
       screenshot.save!

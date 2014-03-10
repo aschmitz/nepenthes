@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140131065924) do
+ActiveRecord::Schema.define(version: 20140210224129) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(version: 20140131065924) do
     t.boolean  "ssl"
     t.boolean  "screenshotted",                    default: false
     t.text     "nikto_results", limit: 2147483647
-    t.string   "final_url"
   end
 
   add_index "ports", ["done"], name: "index_ports_on_done", using: :btree
@@ -85,6 +84,7 @@ ActiveRecord::Schema.define(version: 20140131065924) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_hash"
+    t.string   "final_url"
   end
 
   add_index "screenshots", ["data_hash"], name: "index_screenshots_on_data_hash", using: :btree
