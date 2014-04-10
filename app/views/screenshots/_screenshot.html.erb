@@ -1,7 +1,11 @@
 <% port = screenshot.screenshotable %>
 <tr>
   <td>
+    <% if params[:distinct] == 'true' %>
+      <%= safe_join(screenshot.all_ips.map(&:to_s), "<br/>".html_safe) %>
+    <% else %>
     <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>:<%= link_to port.number, port_path(port.number) %>
+    <% end %>
   </td>
   <td>
     <% if port.ssl == nil %>
