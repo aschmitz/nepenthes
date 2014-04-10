@@ -2,7 +2,9 @@
 <div class="page-header">
   <h1><%= @addresses.count %> hosts with open ports</h1>
 </div>
-<%= link_to "Download CSV", nate_report_ip_addresses_path(params.merge(:format => :csv)) %>
+<%= button_to "Download CSV",
+    nate_report_ip_addresses_path(params.merge(:format => :csv)),
+    method: :get %>
 <p>
 <%= form_tag(nil, method: "get") do %>
 <%= label_tag :port_columns, "Selected ports:" %>
