@@ -9,6 +9,6 @@ class Screenshot < ActiveRecord::Base
   end
 
   def all_ips
-    Screenshot.where(data_hash: data_hash).map(&:screenshotable).uniq.map(&:ip_address).uniq
+    IpAddress.joins(:ports => :screenshots).where(screenshots: {data_hash: data_hash}).distinct
   end
 end
