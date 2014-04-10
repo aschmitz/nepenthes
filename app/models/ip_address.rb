@@ -119,7 +119,7 @@ class IpAddress < ActiveRecord::Base
   end
 
   def port_numbers
-    self.ports.map(&:number)
+    self.ports.map(&:number).sort
   end
 
   def self.to_csv
