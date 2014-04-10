@@ -122,14 +122,15 @@ class IpAddress < ActiveRecord::Base
     self.ports.map(&:number).sort
   end
 
-  def self.to_csv
+  def self.to_csv port_columns
+    port_columns ||= Port::COMMON_PORTS
     CSV.generate do |csv|
-      columns = ['host'] + Port::COMMON_PORTS + ['other']
+      columns = ['host'] + port_columns + ['other']
       csv << columns
       IpAddress.with_ports.each do |addr|
         ports = addr.port_numbers
-        commons = Port::COMMON_PORTS.map {|x| 'X' if ports.include? x}
-        others = (ports - Port::COMMON_PORTS).join ', '
+        commons = port_columns.map {|x| 'X' if ports.include? x}
+        others = (ports - port_columns).join ', '
         row = [addr.address_and_hostname] + commons + [others]
         csv << row
       end

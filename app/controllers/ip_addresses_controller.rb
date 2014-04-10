@@ -153,12 +153,11 @@ class IpAddressesController < ApplicationController
   end
 
   def nate_report
-# we could make COMMON_PORTS a parameter
-    @common_ports = Port::COMMON_PORTS
+    @port_columns = parse_list(params[:port_columns]) || Port::COMMON_PORTS
     @addresses = IpAddress.with_ports
     respond_to do |format|
       format.html
-      format.csv { render text: IpAddress.to_csv }
+      format.csv { render text: IpAddress.to_csv(@port_columns) }
     end
   end
   
@@ -194,5 +193,9 @@ private
     end
     
     allAddresses
+  end
+
+  def parse_list(str)
+    str && str.split(/[, ]+/).map(&:to_i)
   end
 end
