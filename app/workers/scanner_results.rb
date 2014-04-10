@@ -10,6 +10,7 @@ class ScannerResults
     if full
       ip = scan.ip_address
       ip.has_full_scan = true
+      ip.full_scan_timed_out = scan.timed_out
       ip.save!
     end
   end

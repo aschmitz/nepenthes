@@ -7,4 +7,8 @@ class Screenshot < ActiveRecord::Base
     
     Sidekiq::Client.enqueue(ScreenshotWorker, self.id, self.url)
   end
+
+  def all_ips
+    IpAddress.joins(:ports => :screenshots).where(screenshots: {data_hash: data_hash}).distinct
+  end
 end

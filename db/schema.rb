@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131125221449) do
+ActiveRecord::Schema.define(version: 20140210224129) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -23,10 +23,11 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.integer  "region_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "address",       limit: 8,          default: 0
-    t.text     "settings",      limit: 2147483647
-    t.boolean  "has_full_scan",                    default: false
+    t.integer  "address",             limit: 8,          default: 0
+    t.text     "settings",            limit: 2147483647
+    t.boolean  "has_full_scan",                          default: false
     t.string   "hostname"
+    t.boolean  "full_scan_timed_out"
   end
 
   add_index "ip_addresses", ["address"], name: "index_ip_addresses_on_address", unique: true, using: :btree
@@ -46,7 +47,7 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.text     "settings",      limit: 2147483647
     t.boolean  "ssl"
     t.boolean  "screenshotted",                    default: false
-    t.text     "nikto_results"
+    t.text     "nikto_results", limit: 2147483647
   end
 
   add_index "ports", ["done"], name: "index_ports_on_done", using: :btree
@@ -70,6 +71,7 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.datetime "updated_at"
     t.text     "options"
     t.boolean  "processed",                        default: false, null: false
+    t.boolean  "timed_out"
   end
 
   add_index "scans", ["ip_address_id"], name: "index_scans_on_ip_address_id", using: :btree
@@ -81,7 +83,11 @@ ActiveRecord::Schema.define(version: 20131125221449) do
     t.string   "screenshotable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "data_hash"
+    t.string   "final_url"
   end
+
+  add_index "screenshots", ["data_hash"], name: "index_screenshots_on_data_hash", using: :btree
 
   create_table "taggings", force: true do |t|
     t.integer  "tag_id"

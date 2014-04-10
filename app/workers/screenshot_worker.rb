@@ -11,6 +11,11 @@ class ScreenshotWorker
         $PHANTOMJS_PATH, '--ignore-ssl-errors=yes', $SCREENSHOT_SCRIPT_PATH,
         url)
     
-    Sidekiq::Client.enqueue(ScreenshotResults, id, encoded_image)
+    if status == 0
+      Sidekiq::Client.enqueue(ScreenshotResults, id, encoded_image)
+    else
+      logger.info { "phantomjs died, status: #{status}" }
+      Sidekiq::Client.enqueue(ScreenshotWorker, id, url)
+    end
   end
 end

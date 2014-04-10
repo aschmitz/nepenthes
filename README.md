@@ -7,14 +7,14 @@
 * `bundle install`
 * `cp config/database.yml.example config/database.yml` 
 * `cp config/auth.yml.example config/auth.yml`
-* Edit config/database.yml. Set it up with MySQL or MariaDB, please. You'll be happy you did. SQLite, in particular, is problematic.
+* Edit config/database.yml if desired. Set it up with MySQL or MariaDB, please. You'll be happy you did. SQLite, in particular, is problematic. (The example configuration is already set up with MySQL)
 * Edit config/auth.yml. Pick a username and password. You'll be using HTTP Basic auth, with the same username/password for everybody.
-* `echo "Nepenthes::Application.config.secret_token = \"``rake secret``\"" > config/initializers/secret_token.rb` (Note that you need backticks around "rake secret", but our GH markdown doesn't seem to tolerate double backticks well.)
+* ```echo "Nepenthes::Application.config.secret_token = \"`rake secret`\"" > config/initializers/secret_token.rb```
 * Make sure that your database is running (MySQL - `mysql.server start` - or SQLite)
 * Edit the `config/database.yml` to have the correct connection info for your database
 * `rake db:create` to create the netpen database.
 * `rake db:migrate`
-* If you're not already running Redis, run it. (`redis-server` in a new terminal window is fine, as is running it as a daemon.) Be warned that Redis listens on all interfaces by default. Nepenthes only needs to access it via localhost, so feel free to lock down Redis' configuration.
+* If you're not already running Redis, run it. (`redis-server` in a new terminal window is fine, as is running it as a daemon.) Be warned that Redis may listen on all interfaces by default, depending on your installation method. Nepenthes only needs to access it via localhost, so feel free to lock down Redis' configuration. Homebrew sets it up correctly, binding on localhost only.
 * `rails s`
 * In another terminal window on your local computer, run `sidekiq -c 4 -r . -q results -v`. (If you are using SQLite, you *must not* use more than one thread here. Other databases can use more, but it won't help much: this isn't a very slow step.)
 * Visit http://localhost:3000/regions
@@ -27,7 +27,7 @@ If you want to run Nepenthes workers locally:
 For remote workers (highly recommended, VPSes are cheap and many allow scanning if you only scan ranges you have permission to scan):
 
 * Get something running *Ubuntu 12.10 or newer* (older versions have severely outdated copies of some packages, and errors will result).
-* From your local Nepenthes directory, run `rsync -a --exclude log --exclude log --exclude config/database.yml --exclude .bundle --exclude Gemfile.lock . tendril:~/nepenthes` (where `tendril` is your host, consider adding it to your `.ssh/config`)
+* From your local Nepenthes directory, run `rsync -a --exclude log --exclude tmp --exclude config/database.yml --exclude .bundle --exclude Gemfile.lock . tendril:~/nepenthes` (where `tendril` is your host, consider adding it to your `.ssh/config`)
 * `ssh -R 127.0.0.1:6379:127.0.0.1:6379 tendril` (log in to your remote VM, and forward your local Redis connection)
 * The rest is on the remote VM:
 * `sudo apt-get install ruby1.9.1 ruby1.9.1-dev libsqlite3-dev libxslt1-dev nmap phantomjs nikto`
@@ -64,7 +64,7 @@ For full scans:
 Once your scans are done:
 
 * To check whether ports are using *SSL* or not: `Port.check_all_ssl!`.
-* To get *screenshots* of applicable webpages (including on all ports), do `Port.take_all_screenshots!`. This is on the `screenshot` queue, and requires PhantomJS on the worker. (Packages exist in most OS's package managers, any recent version is fine.) `sidekiq -c [number of threads] -r . -q screenshot -v` will get it running.
+* To get *screenshots* of applicable webpages (including on all ports), do `Port.take_all_screenshots!`. This is on the `screenshot` queue, and requires PhantomJS on the worker. (Packages exist in most OS's package managers, any recent version is fine. Notably, the version available in Ubuntu 12.04 is more troublesome; you should just download a binary.) `sidekiq -c [number of threads] -r . -q screenshot -v` will get it running.
 * To process the results, you'll want to keep a results processor going. `sidekiq -c 4 -r . -q results -v` if you didn't still have it running.
 
 ## Results

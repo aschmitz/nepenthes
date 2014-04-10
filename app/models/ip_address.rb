@@ -8,6 +8,8 @@ class IpAddress < ActiveRecord::Base
   store :settings, coder: JSON
   
   default_scope { order(:address) }
+
+  scope :with_ports, -> { joins(:ports).distinct }
   
   def address_and_hostname
     if self.hostname.nil? || self.hostname.empty?
@@ -56,6 +58,21 @@ class IpAddress < ActiveRecord::Base
     
     queued
   end
+
+  def self.queue_rescans! timeout
+    queued = 0
+    self.where(full_scan_timed_out: true).each do |ip|
+      scan = ip.scans.create
+      ip.full_scan_timed_out = false
+      ip.save!
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s, timeout)
+      queued += 1
+    end
+    # do we want to delete the old scans?
+    # or repurpose them?
+
+    queued
+  end
   
   def self.queue_quick_scans!
     queued = 0
@@ -95,5 +112,28 @@ class IpAddress < ActiveRecord::Base
   
   def queue_check_hostname!
     Sidekiq::Client.enqueue(HostnameWorker, self.id, self.to_s)
+  end
+
+  def has_port x
+    self.ports.where(number: x).any?
+  end
+
+  def port_numbers
+    self.ports.map(&:number).sort
+  end
+
+  def self.to_csv port_columns
+    port_columns ||= Port::COMMON_PORTS
+    CSV.generate do |csv|
+      columns = ['host'] + port_columns + ['other']
+      csv << columns
+      IpAddress.with_ports.each do |addr|
+        ports = addr.port_numbers
+        commons = port_columns.map {|x| 'X' if ports.include? x}
+        others = (ports - port_columns).join ', '
+        row = [addr.address_and_hostname] + commons + [others]
+        csv << row
+      end
+    end
   end
 end

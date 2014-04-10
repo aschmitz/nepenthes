@@ -1,11 +1,10 @@
+<% port = screenshot.screenshotable %>
 <tr>
   <td>
-    <% if show == :port %>
-      <%= link_to port.number, port_path(port.number) %>
-    <% elsif show == :address %>
-      <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>
+    <% if params[:distinct] == 'true' %>
+      <%= safe_join(screenshot.all_ips.map(&:to_s), "<br/>".html_safe) %>
     <% else %>
-      <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>:<%= link_to port.number, port_path(port.number) %>
+    <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>:<%= link_to port.number, port_path(port.number) %>
     <% end %>
   </td>
   <td>
@@ -18,7 +17,7 @@
       <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
     <% end %>
   </td>
-  <td><%= h(port.screenshots.first.final_url) if port.screenshots.any? %></td>
+  <td><%= h(screenshot.final_url) %></td>
   <td>
     <% if port.ip_address.tags.any? %>
       <% port.ip_address.tags.each do |tag| %>
@@ -32,11 +31,7 @@
     <% end %>
   </td>
   <td>
-    <%= port.extra %>
-    <% unless port.screenshots.where('length(data) > 0').empty?
-      ss = port.screenshots.where('length(data) > 0').first %><br>
-      <%= link_to (image_tag screenshot_path(ss.id), width: 200, height: 150), ss.url, target: '_blank' %>
-    <% end %>
+    <%= link_to (image_tag screenshot_path(screenshot.id), width: 200, height: 150), screenshot.url, target: '_blank' %>
   </td>
   <td><%= simple_format(h(port.notes)) %></td>
   <td><%= simple_format(h(port.nikto_results)) %></td>
