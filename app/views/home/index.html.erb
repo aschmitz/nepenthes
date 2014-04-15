@@ -5,11 +5,13 @@
 <%
 hosts = IpAddress.count
 open_ports = Port.count
+live_hosts = IpAddress.with_ports.count
 busy_workers = Sidekiq::Workers.new.size
 %>
 <p>
   Nepenthes is currently tracking <strong><%= pluralize hosts, 'host' %></strong>
-  with <strong><%= pluralize open_ports, 'open port' %></strong> known.
+  with <strong><%= pluralize open_ports, 'open port' %></strong> found
+  on <strong><%= pluralize live_hosts, 'host' %></strong>.
   There <%= busy_workers == 1 ? 'is' : 'are' %> currently <strong><%= pluralize busy_workers, 'busy worker' %></strong>.
 </p>
 
@@ -55,6 +57,7 @@ busy_workers = Sidekiq::Workers.new.size
 total_addresses = IpAddress.count
 missing_scan = IpAddress.includes(:scans).where(:scans => {:ip_address_id => nil}).count
 missing_full = IpAddress.where(has_full_scan: false).count
+timed_out = IpAddress.where(full_scan_timed_out: true).count
 %>
 <table class="table table-striped table-nonfluid">
   <tr>
@@ -98,6 +101,21 @@ missing_full = IpAddress.where(has_full_scan: false).count
         class: 'btn btn-mini btn-danger',
         disabled: missing_full.zero?,
         confirm: queue_length['lomem_slow'].zero? ? false : "Are you sure? There are #{pluralize queue_length['lomem_slow'], 'job'} in the queue, which may include full scans." %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= timed_out %> where full scan timed out
+    </td>
+    <td>
+      <%= form_tag :action => 'action', :id => 'ipaddress_rescan' do %>
+      <%= submit_tag 'Re-queue Full Scans',
+        class: 'btn btn-mini btn-danger',
+        disabled: timed_out.zero?,
+        confirm: queue_length['lomem_slow'].zero? ? false : "Are you sure? There are #{pluralize queue_length['lomem_slow'], 'job'} in the queue, which may include full scans." %>
+      <%= label_tag :timeout, "with timeout (minutes):" %>
+      <%= text_field_tag :timeout, 30 %>
+      <% end %>
     </td>
   </tr>
 </table>

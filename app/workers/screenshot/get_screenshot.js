@@ -26,6 +26,7 @@ if (system.args.length != 2) {
     });
     
     window.setTimeout(function () {
+      console.log(encodeURI(page.url));
       console.log(page.renderBase64('PNG'));
       phantom.exit();
     }, 2000);

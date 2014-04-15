@@ -1,0 +1,42 @@
+<%- model_class = IpAddress -%>
+<div class="page-header">
+  <h1><%= @addresses.count %> hosts with open ports</h1>
+</div>
+<%= button_to "Download CSV",
+    nate_report_ip_addresses_path(params.merge(:format => :csv)),
+    method: :get %>
+<p>
+<%= form_tag(nil, method: "get") do %>
+<%= label_tag :port_columns, "Selected ports:" %>
+<%= text_field_tag :port_columns, @port_columns %>
+<%= submit_tag 'Go',
+  class: 'btn btn-mini' %>
+<% end %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:address) %></th>
+<% @port_columns.each do |port| %>
+      <th><%= port %></th>
+<% end %>
+      <th>Other Ports</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @addresses.each do |ip_address| %>
+    <% ports = ip_address.port_numbers %>
+      <tr>
+        <td><%= link_to ip_address.address_and_hostname, ip_address_path(ip_address) %></td>
+        <% @port_columns.each do |port| %>
+          <td>
+            <%= 'X' if ports.include? port %>
+          </td>
+        <% end %>
+        <td>
+          <%= (ip_address.port_numbers - @port_columns).join ', ' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

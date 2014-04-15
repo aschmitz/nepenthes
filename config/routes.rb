@@ -5,7 +5,8 @@ Nepenthes::Application.routes.draw do
   
   root to: 'home#index'
   post 'action', controller: 'home', action: 'action'
-  get 'screenshots', controller: 'home', action: 'screenshots'
+
+  resources :screenshots
   
   resources :domains
   
@@ -16,6 +17,7 @@ Nepenthes::Application.routes.draw do
       post 'batch_delete'
       post 'search'
       get 'tagged/:tag', :action => 'index', :as => 'tagged'
+      get 'nate_report'
     end
   end
   
@@ -31,8 +33,6 @@ Nepenthes::Application.routes.draw do
   end
   
   resources :regions
-  
-  get 'dynamic/screenshot/:id', controller: 'dynamic', action: 'screenshot', as: 'screenshot'
   
   # The priority is based upon order of creation:
   # first created -> highest priority.

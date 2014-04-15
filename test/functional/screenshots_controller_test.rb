@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DynamicControllerTest < ActionController::TestCase
+class ScreenshotsControllerTest < ActionController::TestCase
   # test "the truth" do
   #   assert true
   # end

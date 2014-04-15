@@ -1,6 +1,0 @@
-<div class="page-header">
-  <h1><%= pluralize @screenshots.total_count, 'screenshots' %><%= params[:id] %><%= params[:tag] ? " tagged \"#{params[:tag]}\"" : '' %></h1>
-</div>
-<%= paginate @screenshots %>
-<%= render partial: 'ports/ports', object: @screenshots.map(&:screenshotable), locals: {show: :both} %>
-<%= paginate @screenshots %>

@@ -1,0 +1,7 @@
+<div class="page-header">
+  <h1><%= pluralize @screenshots.total_count, params[:distinct] == 'true' ? 'distinct screenshots' : 'screenshots' %><%= params[:id] %><%= params[:tag] ? " tagged \"#{params[:tag]}\"" : '' %></h1>
+</div>
+<%= link_to 'Toggle Distinct', screenshots_path(distinct: string_not(params[:distinct])), class: 'btn btn-mini' %>
+<%= paginate @screenshots %>
+<%= render partial: 'table' %>
+<%= paginate @screenshots %>
