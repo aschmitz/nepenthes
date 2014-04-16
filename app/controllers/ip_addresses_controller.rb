@@ -1,6 +1,4 @@
 class IpAddressesController < ApplicationController
-  IP_REGEX = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d+)?/
-  
   # GET /ip_addresses
   # GET /ip_addresses.json
   def index
@@ -123,7 +121,7 @@ class IpAddressesController < ApplicationController
     job_id = BatchIpWorker.perform_async(:create, params)
 
     flash[:success] = "Batch job for IP upload started."
-    redirect_to batch_status_path(:job_id => job_id)
+    redirect_to batch_status_ip_addresses_path(:job_id => job_id)
   end
 
   def batch_delete
@@ -131,7 +129,7 @@ class IpAddressesController < ApplicationController
     job_id = BatchIpWorker.perform_async(:delete, params)
 
     flash[:success] = "Batch job for IP delete started."
-    redirect_to batch_status_path(:job_id => job_id)
+    redirect_to batch_status_ip_addresses_path(:job_id => job_id)
   end
 
   def nate_report
@@ -145,7 +143,12 @@ class IpAddressesController < ApplicationController
 
   def batch_status
     @job_id = params[:job_id]
-    container = SidekiqStatus::Container.load(params[:job_id])
+
+    begin
+      container = SidekiqStatus::Container.load(params[:job_id])
+    rescue SidekiqStatus::Container::StatusNotFound
+      @container = nil
+    end
 
     unless container.nil?
       @status = container.status

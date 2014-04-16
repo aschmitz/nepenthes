@@ -16,7 +16,7 @@
 * `rake db:migrate`
 * If you're not already running Redis, run it. (`redis-server` in a new terminal window is fine, as is running it as a daemon.) Be warned that Redis may listen on all interfaces by default, depending on your installation method. Nepenthes only needs to access it via localhost, so feel free to lock down Redis' configuration. Homebrew sets it up correctly, binding on localhost only.
 * `rails s`
-* In another terminal window on your local computer, run `sidekiq -c 4 -r . -q results -v`. (If you are using SQLite, you *must not* use more than one thread here. Other databases can use more, but it won't help much: this isn't a very slow step.)
+* In another terminal window on your local computer, run `sidekiq -c 4 -r . -q results,batch_queue -v`. (If you are using SQLite, you *must not* use more than one thread here. Other databases can use more, but it won't help much: this isn't a very slow step.)
 * Visit http://localhost:3000/regions
 
 If you want to run Nepenthes workers locally:
