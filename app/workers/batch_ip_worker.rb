@@ -14,9 +14,20 @@ class BatchIpWorker
     def create
       base_tags = parameters[:tags].gsub(/\s+,\s*/m, ' ').strip.split(" ")
       base_tags.push(Region.find_by_id(parameters[:region_id]).name)
-      
+
+      # Convert input to IPS
+      parsed_ips = text_to_ips(parameters[:addresses])
+
+      # Keep track of the total number of ips to process for client status
+      self.total = parsed_ips.count
+      process_index_count = 0
+
       # Process 5000 IPs at a time
-      text_to_ips(parameters[:addresses]).each_slice(5000) do |address_and_tags_slice|
+      parsed_ips.each_slice(5000) do |address_and_tags_slice|
+        # Update status count
+        process_index_count += address_and_tags_slice.count
+        self.at(process_index_count)
+
         ActiveRecord::Base.transaction do
           address_and_tags_slice.each do |address_and_tags|
             newAddress = IpAddress.find_or_create_by(address: address_and_tags[0].to_i(:ip))
