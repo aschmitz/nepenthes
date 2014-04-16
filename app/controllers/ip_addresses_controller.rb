@@ -119,6 +119,7 @@ class IpAddressesController < ApplicationController
   end
 
   def batch_create
+    # Find me in app/workers/batch_ip_worker.rb
     job_id = BatchIpWorker.perform_async(:create, params)
 
     flash[:success] = "Batch job for IP upload started."
@@ -126,6 +127,7 @@ class IpAddressesController < ApplicationController
   end
 
   def batch_delete
+    # Find me in app/workers/batch_ip_worker.rb
     job_id = BatchIpWorker.perform_async(:delete, params)
 
     flash[:success] = "Batch job for IP delete started."
