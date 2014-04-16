@@ -117,19 +117,19 @@ class IpAddressesController < ApplicationController
       render :text => 'Unknown batch action.'
     end
   end
-  
+
   def batch_create
     job_id = BatchIpWorker.perform_async(:create, params)
-    
+
     flash[:success] = "Batch job for IP upload started."
-    redirect_to batch_ip_addresses_path(:region_id => params[:region_id])
+    redirect_to batch_status_path(:job_id => job_id)
   end
-  
+
   def batch_delete
     job_id = BatchIpWorker.perform_async(:delete, params)
-    
+
     flash[:success] = "Batch job for IP delete started."
-    redirect_to batch_ip_addresses_path(:type => 'delete')
+    redirect_to batch_status_path(:job_id => job_id)
   end
 
   def nate_report
@@ -141,7 +141,21 @@ class IpAddressesController < ApplicationController
     end
   end
 
-  def parse_list(str)
-    str && str.split(/[, ]+/).map(&:to_i)
+  def batch_status
+    @job_id = params[:job_id]
+    container = SidekiqStatus::Container.load(params[:job_id])
+
+    unless container.nil?
+      @status = container.status
+      @at = container.at
+      @total = container.total
+      @percent_complete = container.pct_complete
+    end
   end
+
+  private
+
+    def parse_list(str)
+      str && str.split(/[, ]+/).map(&:to_i)
+    end
 end

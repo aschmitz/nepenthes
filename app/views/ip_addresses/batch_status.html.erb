@@ -1,0 +1,9 @@
+
+<% if @status.nil? %>
+  <h1><%= "No status found for #{@job_id}" %></h1>
+<% else %>
+  <%= @status %>
+  <%= @at %>
+  <%= @total %>
+  <%= @percent_complete %>
+<% end %>

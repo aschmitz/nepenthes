@@ -13,6 +13,7 @@ Nepenthes::Application.routes.draw do
   resources :ip_addresses do
     collection do
       get 'batch'
+      get 'batch_status'
       post 'batch_create'
       post 'batch_delete'
       post 'search'
