@@ -13,7 +13,7 @@ class ScreenshotWorker
     
     if status == 0
       Sidekiq::Client.enqueue(ScreenshotResults, id, encoded_image)
-    elsif status == 124
+    elsif status.exitstatus == 124
       # Timeout
       logger.info { "phantomjs timed out, reporting failure." }
       Sidekiq::Client.enqueue(ScreenshotResults, id, 'failed')
