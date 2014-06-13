@@ -20,6 +20,7 @@ class IpAddressesController < ApplicationController
           :type => 'text/xml; charset=UTF-8;',
           :disposition => 'attachment; filename=nmap.xml'
         }
+      format.text { render text: IpAddress.all.map(&:to_s).join("\n") }
     end
   end
   
