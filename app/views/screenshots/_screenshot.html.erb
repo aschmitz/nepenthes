@@ -17,7 +17,7 @@
       <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
     <% end %>
   </td>
-  <td><%= h(screenshot.final_url) %></td>
+  <td><%= link_to h(screenshot.final_url), screenshot.final_url %></td>
   <td>
     <% if port.ip_address.tags.any? %>
       <% port.ip_address.tags.each do |tag| %>
