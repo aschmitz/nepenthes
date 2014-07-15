@@ -16,11 +16,13 @@ gem 'acts-as-taggable-on'
 # XML parsing
 gem 'nokogiri'
 
+# Used for pinging, has to be in both as the frontend still loads workers.
+gem 'net-ping'
+
 group :remote do
   # Needed for the in-memory SQLite stub. Pointless, but easier than patching
   #  ActiveRecord out of everything, or Sidekiq to not load models.
   gem 'sqlite3'
-  gem 'net-ping'
 end
 
 group :local do
