@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140415192243) do
+ActiveRecord::Schema.define(version: 20140715180911) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -28,6 +28,9 @@ ActiveRecord::Schema.define(version: 20140415192243) do
     t.boolean  "has_full_scan",                          default: false
     t.string   "hostname"
     t.boolean  "full_scan_timed_out"
+    t.boolean  "pinged"
+    t.boolean  "pingable"
+    t.float    "ping_duration"
   end
 
   add_index "ip_addresses", ["address"], name: "index_ip_addresses_on_address", unique: true, using: :btree

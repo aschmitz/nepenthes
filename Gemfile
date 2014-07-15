@@ -20,6 +20,7 @@ group :remote do
   # Needed for the in-memory SQLite stub. Pointless, but easier than patching
   #  ActiveRecord out of everything, or Sidekiq to not load models.
   gem 'sqlite3'
+  gem 'net-ping'
 end
 
 group :local do
