@@ -1,4 +1,4 @@
-class HostnameResults
+class PingResults
   include Sidekiq::Worker
   sidekiq_options :queue => :results
   

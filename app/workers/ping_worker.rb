@@ -1,6 +1,6 @@
 require 'net/ping'
 
-class HostnameWorker
+class PingWorker
   include Sidekiq::Worker
   sidekiq_options :queue => :lomem_fast
   

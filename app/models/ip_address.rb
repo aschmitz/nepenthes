@@ -113,6 +113,28 @@ class IpAddress < ActiveRecord::Base
   def queue_check_hostname!
     Sidekiq::Client.enqueue(HostnameWorker, self.id, self.to_s)
   end
+  
+  def self.pingable
+    self.where(pingable: true)
+  end
+  
+  def self.not_pinged
+    self.where(pinged: false)
+  end
+  
+  def self.queue_pings!
+    queued = 0
+    self.not_pinged.each do |ip|
+      ip.queue_ping!
+      queued += 1
+    end
+    
+    queued
+  end
+  
+  def queue_ping!
+    Sidekiq::Client.enqueue(PingWorker, self.id, self.to_s)
+  end
 
   def has_port x
     self.ports.where(number: x).any?
