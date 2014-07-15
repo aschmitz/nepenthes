@@ -43,7 +43,8 @@ class IpAddress < ActiveRecord::Base
     self.where(has_full_scan: false).each do |ip|
       if ip.ports.count > 0
         scan = ip.scans.create
-        Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s)
+        Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
+            ip.ping_duration)
         queued += 1
       else
         scanlater << ip
@@ -52,7 +53,8 @@ class IpAddress < ActiveRecord::Base
     
     scanlater.each do |ip|
       scan = ip.scans.create
-      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s)
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
+          ip.ping_duration)
       queued += 1
     end
     
@@ -65,7 +67,8 @@ class IpAddress < ActiveRecord::Base
       scan = ip.scans.create
       ip.full_scan_timed_out = false
       ip.save!
-      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s, timeout)
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
+          ip.ping_duration, timeout)
       queued += 1
     end
     # do we want to delete the old scans?
