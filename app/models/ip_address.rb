@@ -51,6 +51,14 @@ class IpAddress < ActiveRecord::Base
       end
     end
     
+    scanlater.sort! { |a,b|
+      a_score = a.pingable? ? 2 : 0;
+      a_score += a.hostname.empty? ? 0 : 1;
+      b_score = b.pingable? ? 2 : 0;
+      b_score += b.hostname.empty? ? 0 : 1;
+      b_score <=> a_score
+    }
+    
     scanlater.each do |ip|
       scan = ip.scans.create
       Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
@@ -79,7 +87,17 @@ class IpAddress < ActiveRecord::Base
   
   def self.queue_quick_scans!
     queued = 0
-    self.includes(:scans).where(:scans => {:ip_address_id => nil}).each do |ip|
+    scan = self.includes(:scans).where(:scans => {:ip_address_id => nil}).all
+    
+    scan.sort! { |a,b|
+      a_score = a.pingable? ? 2 : 0;
+      a_score += a.hostname.empty? ? 0 : 1;
+      b_score = b.pingable? ? 2 : 0;
+      b_score += b.hostname.empty? ? 0 : 1;
+      b_score <=> a_score
+    }
+    
+    scan.each do |ip|
       ip.queue_scan!
       queued += 1
     end
