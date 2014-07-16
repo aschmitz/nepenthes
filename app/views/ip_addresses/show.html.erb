@@ -18,7 +18,8 @@
 
 <h2>Open ports</h2>
 <% if @ip_address.ports.any? %>
-  <%= render partial: 'ports/ports', object: @ip_address.ports, locals: {show: :port} %>
+  <%= render partial: 'ports/ports',
+      object: @ip_address.ports.order(:number), locals: {show: :port} %>
 <% else %>
   No open ports found (yet)!
 <% end %>
