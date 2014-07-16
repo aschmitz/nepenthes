@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20140715180911) do
     t.boolean  "has_full_scan",                          default: false
     t.string   "hostname"
     t.boolean  "full_scan_timed_out"
-    t.boolean  "pinged"
+    t.boolean  "pinged",                                 default: false
     t.boolean  "pingable"
     t.float    "ping_duration"
   end
