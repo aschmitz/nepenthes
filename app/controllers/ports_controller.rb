@@ -19,8 +19,10 @@ class PortsController < ApplicationController
     }
     
     respond_to do |format|
-      format.html {  @output_array }
-      format.json {  render json: @ports }
+      format.html { @output_array }
+      format.json { render json: @ports }
+      format.text { render text:
+          Port.order('number').group('number').map(&:number).join("\n") }
       format.csv { render text: Port.order('number').includes(:ip_address).to_csv }
     end
   end
@@ -43,6 +45,8 @@ class PortsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @ports }
+      format.text { render text: @ports.all.map{ |p|
+          p.ip_address.to_s }.join("\n") }
       format.csv { render text: @ports.to_csv }
     end
   end
