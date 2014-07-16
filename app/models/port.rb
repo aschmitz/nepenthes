@@ -1,5 +1,5 @@
 class Port < ActiveRecord::Base
-  belongs_to :ip_address
+  belongs_to :ip_address, counter_cache: true
   belongs_to :scan
   has_many :screenshots, as: :screenshotable, dependent: :destroy
   attr_accessible :number, :product, :version, :extra, :notes, :done

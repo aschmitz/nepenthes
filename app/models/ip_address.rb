@@ -37,29 +37,18 @@ class IpAddress < ActiveRecord::Base
   
   def self.queue_full_scans!
     queued = 0
-    scanlater = []
-    # We'd like this to really only queue full scans where we haven't before,
-    #  but we don't store that information (yet).
-    self.where(has_full_scan: false).each do |ip|
-      if ip.ports.count > 0
-        scan = ip.scans.create
-        Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
-            ip.ping_duration)
-        queued += 1
-      else
-        scanlater << ip
-      end
-    end
-    
-    scanlater.sort! { |a,b|
-      a_score = a.pingable? ? 2 : 0;
-      a_score += a.hostname.empty? ? 0 : 1;
+    scan = self.where(has_full_scan: false).all
+    scan.sort! { |a,b|
+      a_score = a.pingable? ? 2 : 0
+      a_score += a.hostname.empty? ? 0 : 1
+      a_score += a.ports.size.zero? ? 0 : 2 + a.ports.size
       b_score = b.pingable? ? 2 : 0;
       b_score += b.hostname.empty? ? 0 : 1;
+      b_score += b.ports.size.zero? ? 0 : 2 + b.ports.size
       b_score <=> a_score
     }
     
-    scanlater.each do |ip|
+    scan.each do |ip|
       scan = ip.scans.create
       Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
           ip.ping_duration)
