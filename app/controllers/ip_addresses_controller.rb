@@ -128,7 +128,8 @@ class IpAddressesController < ApplicationController
       text_to_ips(params[:addresses]).each do |addressAndTags|
         newAddress = IpAddress.find_or_create_by(address: addressAndTags[0].to_i(:ip))
         newAddress.region_id = params[:region_id]
-        newAddress.tag_list = base_tags.concat(addressAndTags[1]).join(', ')
+        newAddress.tag_list.add(
+            base_tags.concat(addressAndTags[1]).join(', '), parse: true)
         newAddress.save
         total_addresses += 1
       end
