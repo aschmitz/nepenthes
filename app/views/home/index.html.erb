@@ -55,6 +55,8 @@ busy_workers = Sidekiq::Workers.new.size
 <h3>IP Addresses</h3>
 <%
 total_addresses = IpAddress.count
+missing_hostname = IpAddress.not_hostname_checked.count
+missing_ping = IpAddress.not_pinged.count
 missing_scan = IpAddress.includes(:scans).where(:scans => {:ip_address_id => nil}).count
 missing_full = IpAddress.where(has_full_scan: false).count
 timed_out = IpAddress.where(full_scan_timed_out: true).count
@@ -78,6 +80,28 @@ timed_out = IpAddress.where(full_scan_timed_out: true).count
           class: 'btn btn-mini',
             disabled: total_addresses.zero?),
         batch_ip_addresses_path(:type => 'delete') %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_hostname %> without hostnames checked
+    </td>
+    <td>
+      <%= button_to 'Queue Hostname Checks',
+        {:action => 'action', :id => 'ipaddress_hostname'},
+        class: 'btn btn-mini btn-success',
+        disabled: missing_hostname.zero? %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <%= missing_ping %> not yet pinged
+    </td>
+    <td>
+      <%= button_to 'Queue Pings',
+        {:action => 'action', :id => 'ipaddress_ping'},
+        class: 'btn btn-mini btn-success',
+        disabled: missing_ping.zero? %>
     </td>
   </tr>
   <tr>
@@ -122,7 +146,6 @@ timed_out = IpAddress.where(full_scan_timed_out: true).count
 
 <h3>Ports</h3>
 <%
-missing_hostname = IpAddress.not_hostname_checked.count
 missing_ssl = Port.not_ssl_checked.count
 missing_screenshots = Port.not_screenshotted.count
 missing_nikto = Port.not_nikto_scanned.count
@@ -131,17 +154,6 @@ missing_nikto = Port.not_nikto_scanned.count
   <tr>
     <th>Status</th>
     <th>Actions</th>
-  </tr>
-  <tr>
-    <td>
-      <%= missing_hostname %> without hostnames checked
-    </td>
-    <td>
-      <%= button_to 'Queue Hostname Checks',
-        {:action => 'action', :id => 'ipaddress_hostname'},
-        class: 'btn btn-mini btn-success',
-        disabled: missing_hostname.zero? %>
-    </td>
   </tr>
   <tr>
     <td>
