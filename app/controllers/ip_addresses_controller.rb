@@ -1,4 +1,6 @@
 class IpAddressesController < ApplicationController
+  include ActionController::Live
+  
   IP_REGEX = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d+)?/
   
   # GET /ip_addresses
@@ -16,10 +18,26 @@ class IpAddressesController < ApplicationController
       format.html # index.html.erb
       format.json { render json: @ip_addresses }
       format.xml {
-        send_data Scan.get_all_scanned_xml,
-          :type => 'text/xml; charset=UTF-8;',
-          :disposition => 'attachment; filename=nmap.xml'
-        }
+        response.headers['Content-Type'] = 'text/xml; charset=UTF-8;'
+        response.headers['Content-Disposition'] =
+            'attachment; filename=nmap.xml'
+        response.stream.write <<-header
+<?xml version="1.0"?>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl"
+  type="text/xsl"?>
+  <nmaprun scanner="nmap" start="0" startstr="Long ago" version="6.40"
+    xmloutputversion="1.04">
+  <scaninfo type="connect" protocol="tcp" numservices="65535"
+    services="1-65535"/>
+  <verbose level="1"/>
+  <debugging level="0"/>
+        header
+        Scan.where(:processed => true).each do |scan|
+          response.stream.write scan.get_host_xml.to_xml
+        end
+        response.stream.write '</nmaprun>'
+        response.stream.close
+      }
       format.text { render text: IpAddress.all.map(&:to_s).join("\n") }
     end
   end
