@@ -9,7 +9,7 @@ class IpAddress < ActiveRecord::Base
   
   default_scope { order(:address) }
 
-  scope :with_ports, -> { joins(:ports).distinct }
+  scope :with_ports, -> { where('ports_count > 0') }
   
   def address_and_hostname
     if self.hostname.nil? || self.hostname.empty?
