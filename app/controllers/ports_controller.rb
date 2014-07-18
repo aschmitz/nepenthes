@@ -37,13 +37,13 @@ class PortsController < ApplicationController
     end
     
     if params[:todo].present?
-      @ports = @ports.where(:number => params[:id]).where("ports.done IS NULL or ports.done = 0").includes(:ip_address).order('ip_addresses.address').page(params[:page]).per(50)
+      @ports = @ports.where(:number => params[:id]).where("ports.done IS NULL or ports.done = 0").includes(:ip_address).order('ip_addresses.address')
     else
-      @ports = @ports.where(:number => params[:id]).includes(:ip_address).order('ip_addresses.address').page(params[:page]).per(50)
+      @ports = @ports.where(:number => params[:id]).includes(:ip_address).order('ip_addresses.address')
     end
     
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { @ports = @ports.page(params[:page]).per(50) }
       format.json { render json: @ports }
       format.text { render text: @ports.all.map{ |p|
           p.ip_address.to_s }.join("\n") }
