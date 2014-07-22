@@ -80,9 +80,9 @@ class IpAddress < ActiveRecord::Base
     
     scan.sort! { |a,b|
       a_score = a.pingable? ? 2 : 0;
-      a_score += a.hostname.empty? ? 0 : 1;
+      a_score += a.hostname.to_s.empty? ? 0 : 1;
       b_score = b.pingable? ? 2 : 0;
-      b_score += b.hostname.empty? ? 0 : 1;
+      b_score += b.hostname.to_s.empty? ? 0 : 1;
       b_score <=> a_score
     }
     
