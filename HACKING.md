@@ -1,5 +1,28 @@
 # Hacking Nepenthes
 
+## Local Installation
+Unfortunately, development installations are generally not well-supported. Nonetheless, here are some steps for installing 
+* `brew install phantomjs coreutils` or `sudo apt-get install phantomjs`, depending on your OS.
+* `bundle install`
+* `cp config/database.yml.example config/database.yml` 
+* `cp config/auth.yml.example config/auth.yml`
+* Edit config/database.yml if desired. Set it up with MySQL or MariaDB, please. You'll be happy you did. SQLite, in particular, is problematic. (The example configuration is already set up with MySQL)
+* Edit config/auth.yml. Pick a username and password. You'll be using HTTP Basic auth, with the same username/password for everybody.
+* ```echo "Nepenthes::Application.config.secret_token = \"`rake secret`\"" > config/initializers/secret_token.rb```
+* Make sure that your database is running (MySQL - `mysql.server start` - or SQLite)
+* Edit the `config/database.yml` to have the correct connection info for your database
+* `rake db:create` to create the netpen database.
+* `rake db:migrate`
+* If you're not already running Redis, run it. (`redis-server` in a new terminal window is fine, as is running it as a daemon.) Be warned that Redis may listen on all interfaces by default, depending on your installation method. Nepenthes only needs to access it via localhost, so feel free to lock down Redis' configuration. Homebrew sets it up correctly, binding on localhost only.
+* `rails s`
+* In another terminal window on your local computer, run `sidekiq -c 4 -r . -q results -v`. (If you are using SQLite, you *must not* use more than one thread - the `-c 4` value - here. Other databases can use more, but it won't help much: this isn't a very slow step.)
+* Visit http://localhost:3000/regions
+
+If you want to run Nepenthes workers locally:
+* First, reconsider. You *should not* do this from inside a NAT if you're scanning anything public. If you're fully inside a VPN, it *might* work, but may also crash the VPN. The reasoning here is that you're running a lot of nmap scans and will quickly fill up NAT tables and related resources. Doing this will make your sysadmin sad.
+* Second, if you've decided to go for it anyway and not blame any Nepenthes authors, make sure you have local copies of whatever tools you might use. This includes `nmap` for scans, `phantomjs` for screenshots, and `nikto` for Nikto scans.
+* Finally, you will want to run `sidekiq -e sidekiq -c 2 -r ~/nepenthes -q himem_fast -q himem_slow -v` and `sidekiq -e sidekiq -c 20 -r ~/nepenthes -q lomem_fast -q lomem_slow -v` on your local machine. You may need to adjust the `~/nepenthes` directory to suit your environment. Your machine likely has more than 0.5 GB of RAM, so consider increasing the thread count if you have sufficient bandwidth to your target.
+
 # So you want to write a worker
 
 Writing another worker is designed to be easy. (It may or may not fall short, but that's the goal.) If you want to write a new worker, you'll probably want to split it into two parts: the part that actually needs to reach a server, and a part for processing the data and storing results into the database. (This separation is good because occasionally scans need to be run on a client site across a VPN, or on several remote, partially-trusted machines without access to your database.)
