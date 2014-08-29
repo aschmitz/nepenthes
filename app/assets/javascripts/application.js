@@ -36,8 +36,9 @@ close: function() {
 });
 });
 
-function show_notes_dialog(id) {
+function show_notes_dialog(id, current_note) {
     $( "#dialog-form-tag").attr('action', "/ports/" + id);
+    $( "#notes").val(current_note);
     $( "#dialog-form" ).dialog( "open" );
 }
 
