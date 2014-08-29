@@ -1,5 +1,7 @@
 # Nepenthes
 
+Nepenthes is an open-source tool for managing network penetration tests, with a focus on external tests with large numbers of hosts; in particular web-heavy networks. Nepenthes can manage different network based scans in parallel; anything from grabbing SSL information and taking screenshots to standard nmap scans. It uses a queueing and scheduling system to allow off-hours scans, scheduled from anywhere around the world. Scans can be performed from as many hosts as desired, including using public clouds. With a web frontend, Nepenthes makes it easy for multiple team members to collaborate on a test, allowing for easy extraction of desired information. A flexible worker system and easy Rails extensibility make Nepenthes easy to modify, as has been done for several tests at Matasano. These features are usually included in future tests to make the experience even better.
+
 ## Install
 The only officially supported way to run Nepenthes is using two (or more) separate Ubuntu VMs. One VM will be dedicated to managing everything (storing the database, handling user requests, etc.), and the remaining VM(s) will be dedicated to scanning. For our purposes, we'll call the manager VM `sprout`, and assume that there is one scanning VM, called `tendril`. Note that the setup instructions for multiple scanning VMs are exactly the same as for the first one, simply repeat the same steps.
 
@@ -34,12 +36,15 @@ We will install `tendril` first, as `sprout` connects to the scanner. However, y
 
 There is a web interface for this. It isn't quite as configurable for some scans, but *check it out first*. That's just at http://localhost:3000/ . The instructions below assume you aren't using the web interface, so pick and choose as you go if you want more power than you can extract from the web interface.
 
-### Again, use the web interface home page first. If you need configurability that it doesn't give you, here's a way to run them manually.
+### Again, use the web interface home page first
+
+If you need configurability that it doesn't give you, here's a way to run scans manually.
 
 * `rails c`
 * Specify some nmap options, such as `opts = ['-Pn', '-p', '80,443,22,25,21,8080,23,3306,143,53', '-sV', '--version-light']`
     * Note: Spaces in the options aren't treated they way you might expect; if the commandline would be `--scan-delay 250ms`, you need to add it as `['--scan-delay', '250ms']`
 * `IpAddress.includes(:scans).where(:scans => {:ip_address_id => nil}).each {|ip| ip.queue_scan!(opts) }`
+* Note that the `.where(:scans => {:ip_address_id => nil})` portion only queues scans for IP addresses without existing scans. You can modify the conditions if you want, or remove them to scan all IP addresses.
 * Wait for a bit while every IP address has a scan queued.
 * You can follow progress on http://localhost:3000/sidekiq/ .
 
