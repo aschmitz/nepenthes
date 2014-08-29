@@ -1,0 +1,38 @@
+
+<% if @status.nil? %>
+  <h4><%= "No status found for #{@job_id}" %></h1>
+<% else %>
+  <h3>Status for job <%= @job_id %></h1>
+
+  <h4>Progress</h4>
+  <% if @status == "complete" %>
+    <div class="progress progress-success">
+      <div class="bar" style="width: <%= @percent_complete %>%;">
+      </div>
+    </div>
+  <% else %>
+    <div class="progress progress-striped progress-warning active">
+      <div class="bar" style="width: <%= @percent_complete %>%;">
+      </div>
+    </div>
+  <% end %>
+
+  <table class="table table-bordered table-striped ">
+    <tbody>
+      <tr>
+        <td>Status: </td>
+        <td>
+          <%= @status %>
+        </td>
+      </tr>
+      <tr>
+        <td>At: </td>
+        <td><%= @at %></td>
+      </tr>
+      <tr>
+        <td>Total:</td>
+        <td><%= @total %></td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>

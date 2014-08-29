@@ -1,8 +1,4 @@
 class IpAddressesController < ApplicationController
-  include ActionController::Live
-  
-  IP_REGEX = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d+)?/
-  
   # GET /ip_addresses
   # GET /ip_addresses.json
   def index
@@ -136,40 +132,21 @@ class IpAddressesController < ApplicationController
       render :text => 'Unknown batch action.'
     end
   end
-  
+
   def batch_create
-    base_tags = params[:tags].gsub(/\s+,\s*/m, ' ').strip.split(" ")
-    base_tags.push(Region.find_by_id(params[:region_id]).name)
-    total_addresses = 0
-    
-    ActiveRecord::Base.transaction do
-      text_to_ips(params[:addresses]).each do |addressAndTags|
-        newAddress = IpAddress.find_or_create_by(address: addressAndTags[0].to_i(:ip))
-        newAddress.region_id = params[:region_id]
-        newAddress.tag_list.add(
-            base_tags.concat(addressAndTags[1]).join(', '), parse: true)
-        newAddress.save
-        total_addresses += 1
-      end
-    end
-    
-    flash[:success] = "Added/updated #{help.pluralize(total_addresses, 'address')}"
-    redirect_to batch_ip_addresses_path(:region_id => params[:region_id])
+    # Find me in app/workers/batch_ip_worker.rb
+    job_id = BatchIpWorker.perform_async(:create, params)
+
+    flash[:success] = 'Batch job for IP addition started.'
+    redirect_to batch_status_ip_addresses_path(:job_id => job_id)
   end
-  
+
   def batch_delete
-    total_addresses = 0
-    
-    text_to_ips(params[:addresses]).each do |addressAndTags|
-      addr = IpAddress.find_by_address(addressAndTags[0].to_i(:ip))
-      if addr
-        addr.destroy
-        total_addresses += 1
-      end
-    end
-    
-    flash[:success] = "Deleted #{help.pluralize(total_addresses, 'address')}"
-    redirect_to batch_ip_addresses_path(:type => 'delete')
+    # Find me in app/workers/batch_ip_worker.rb
+    job_id = BatchIpWorker.perform_async(:delete, params)
+
+    flash[:success] = 'Batch job for IP delete started.'
+    redirect_to batch_status_ip_addresses_path(:job_id => job_id)
   end
 
   def nate_report
@@ -180,42 +157,27 @@ class IpAddressesController < ApplicationController
       format.csv { render text: IpAddress.to_csv(@port_columns) }
     end
   end
-  
-private
-  def text_to_ips(addresses)
-    allAddresses = []
-    addresses.each_line do |line|
-      next if line.strip == ''
-      
-      parts = line.gsub(/\s+/m, ' ').strip.split(" ")
-      address_begin = parts.shift
-      unless IP_REGEX.match(address_begin)
-        flash[:error] = address_begin+' is not an IP address'
-      end
-      
-      addresses = address_begin.scan(IP_REGEX)
-      address_begin = NetAddr::CIDR.create(addresses[0])
-      if addresses.length > 1
-        address_end = NetAddr::CIDR.create(addresses[1])
-      else
-        address_end = address_begin
-      end
-      
-      parts.shift if parts[0] == '-'
-      
-      if IP_REGEX.match(parts[0])
-        address_end = NetAddr::CIDR.create(parts.shift.scan(IP_REGEX)[0])
-      end
-      
-      (address_begin..address_end).each do |address|
-        allAddresses << [address, parts]
-      end
+
+  def batch_status
+    @job_id = params[:job_id]
+
+    begin
+      container = SidekiqStatus::Container.load(params[:job_id])
+    rescue SidekiqStatus::Container::StatusNotFound
+      @container = nil
     end
-    
-    allAddresses
+
+    unless container.nil?
+      @status = container.status
+      @at = container.at
+      @total = container.total
+      @percent_complete = container.pct_complete
+    end
   end
 
-  def parse_list(str)
-    str && str.split(/[, ]+/).map(&:to_i)
-  end
+  private
+
+    def parse_list(str)
+      str && str.split(/[, ]+/).map(&:to_i)
+    end
 end
