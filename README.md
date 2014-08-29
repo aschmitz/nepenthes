@@ -9,22 +9,22 @@ We will install `tendril` first, as `sprout` connects to the scanner. However, y
 
 * Install a fresh Ubuntu VM. Ubuntu Server 14.04.1 LTS is a good choice, but other versions should still work.
 * On the VM, run the following commands in your user's home directory:
-** `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-worker.sh`
-** `chmod +x install-nepenthes-worker.sh`
-** `sudo ./install-nepenthes-worker.sh`
+    * `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-worker.sh`
+    * `chmod +x install-nepenthes-worker.sh`
+    * `sudo ./install-nepenthes-worker.sh`
 
 ### Manager (`sprout`)
 
 * Install a fresh Ubuntu VM. Ubuntu Server 14.04.1 LTS is a good choice, but other versions should still work.
 * Note that this server will be installed with a MySQL server with a root password of "root", and should under no circumstances be exposed to the Internet. (This should be changed in Nepenthes soon.)
 * On the VM, run the following commands:
-** `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-server.sh`
-** `chmod +x install-nepenthes-server.sh`
-** `sudo ./install-nepenthes-server.sh`
-** `sudo ./start-nepenthes-server.sh`
+    * `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-server.sh`
+    * `chmod +x install-nepenthes-server.sh`
+    * `sudo ./install-nepenthes-server.sh`
+    * `sudo ./start-nepenthes-server.sh`
 * For each tendril server, do the following (note that you may wish to run these in `screen` or `tmux`, as they will need to continue running as long as the worker is running):
-** `ssh -R 127.0.0.1:6379:127.0.0.1:6379 user@tendril-host` (log in to your remote VM, and forward your local Redis connection)
-** Inside the SSH session, run `sudo ./start-nepenthes-worker.sh`
+    * `ssh -R 127.0.0.1:6379:127.0.0.1:6379 user@tendril-host` (log in to your remote VM, and forward your local Redis connection)
+    * Inside the SSH session, run `sudo ./start-nepenthes-worker.sh`
 
 ## Usage
 * Add a region via http://localhost:3000/regions . The start and end test times must be numbers, and will be used to restrict scans to starting between the given hours (in UTC). Note that a patch for this functionality is pending, and it does not work at the moment.
@@ -38,7 +38,7 @@ There is a web interface for this. It isn't quite as configurable for some scans
 
 * `rails c`
 * Specify some nmap options, such as `opts = ['-Pn', '-p', '80,443,22,25,21,8080,23,3306,143,53', '-sV', '--version-light']`
-** Note: Spaces in the options aren't treated they way you might expect; if the commandline would be `--scan-delay 250ms`, you need to add it as `['--scan-delay', '250ms']`
+    * Note: Spaces in the options aren't treated they way you might expect; if the commandline would be `--scan-delay 250ms`, you need to add it as `['--scan-delay', '250ms']`
 * `IpAddress.includes(:scans).where(:scans => {:ip_address_id => nil}).each {|ip| ip.queue_scan!(opts) }`
 * Wait for a bit while every IP address has a scan queued.
 * You can follow progress on http://localhost:3000/sidekiq/ .
