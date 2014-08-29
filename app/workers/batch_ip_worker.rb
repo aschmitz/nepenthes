@@ -1,24 +1,24 @@
 class BatchIpWorker
   include SidekiqStatus::Worker
-  sidekiq_options queue: "batch_queue"
+  sidekiq_options queue: 'batch'
 
   CONCURRENT_IPS = 5000
   IP_REGEX = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:\/\d+)?/
 
   def perform(action, parameters={})
-    if action == "create"
+    if action == 'create'
       batch_create(parameters)
-    elsif action == "delete"
+    elsif action == 'delete'
       batch_delete(parameters)
     end
   end
 
   def batch_create(parameters)
-    base_tags = parameters["tags"].gsub(/\s+,\s*/m, ' ').strip.split(" ")
-    base_tags.push(Region.find_by_id(parameters["region_id"]).name)
+    base_tags = parameters['tags'].gsub(/\s+,\s*/m, ' ').strip.split(' ')
+    base_tags.push(Region.find_by_id(parameters['region_id']).name)
 
     # Convert input to IPS
-    parsed_ips = text_to_ips(parameters["addresses"])
+    parsed_ips = text_to_ips(parameters['addresses'])
 
     # Keep track of the total number of ips to process for client status
     process_index_count = 0
@@ -31,7 +31,7 @@ class BatchIpWorker
       ActiveRecord::Base.transaction do
         address_and_tags_slice.each do |address_and_tags|
           newAddress = IpAddress.find_or_create_by(address: address_and_tags[0].to_i(:ip))
-          newAddress.region_id = parameters["region_id"]
+          newAddress.region_id = parameters['region_id']
           newAddress.tag_list = base_tags.concat(address_and_tags[1]).join(', ')
           newAddress.save
 
@@ -44,8 +44,8 @@ class BatchIpWorker
   end
 
   def batch_delete(parameters)
-    # Convert input to IPS
-    parsed_ips = text_to_ips(parameters["addresses"])
+    # Convert input to IPs
+    parsed_ips = text_to_ips(parameters['addresses'])
 
     # Keep track of the total number of ips to process for client status
     process_index_count = 0
