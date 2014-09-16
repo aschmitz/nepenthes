@@ -83,7 +83,7 @@ echo -e "\n[*] Setting up database"
 RAILS_ENV=production rake db:setup
 
 echo -e "\n[*] Dropping Nepenthes server scripts in ~/"
-cp script/*server*.sh ../
+ln -s script/*server*.sh ../
 
 echo -e "\n[*] Your Nepenthes credentials (SAVE THESE):\nUsername:" \
   "netpen\nPassword: $NEPENTHES_PASS"

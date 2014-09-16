@@ -88,4 +88,6 @@ echo -e "\n[*] Installing Nepenthes' required gems"
 bundle install --without local
 
 echo -e "\n[*] Dropping Nepenthes worker scripts in ~/"
-cp script/*worker*.sh ../
+ln -s script/*worker*.sh ../
+
+echo -e "\n[*] Run ./start-nepenthes-worker.sh to begin."
