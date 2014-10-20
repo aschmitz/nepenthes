@@ -32,7 +32,7 @@ class BatchIpWorker
         address_and_tags_slice.each do |address_and_tags|
           newAddress = IpAddress.find_or_create_by(address: address_and_tags[0].to_i(:ip))
           newAddress.region_id = parameters['region_id']
-          newAddress.tag_list = base_tags.concat(address_and_tags[1]).join(', ')
+          newAddress.tag_list = (base_tags | address_and_tags[1]).join(', ')
           newAddress.save
 
           # Update worker statistics
