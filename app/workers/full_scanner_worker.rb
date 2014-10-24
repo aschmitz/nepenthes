@@ -4,7 +4,9 @@ class FullScannerWorker
   include Sidekiq::Worker
   sidekiq_options :queue => :lomem_slow
   
-  def perform(id, host, ping_duration = nil, timeout=30)
+  def perform(id, host, opts)
+    ping_duration = opts["ping_duration"]
+    timeout       = opts["timeout"] || 30
     # From http://nmap.org/book/man-performance.html:
     #  Look at the maximum round trip time out of ten packets or so. You might
     #  want to double that for the --initial-rtt-timeout and triple or
@@ -33,7 +35,7 @@ class FullScannerWorker
     else
       # nmap didn't finish properly (probably killed), try again later.
       logger.info { "nmap died, status: #{status}" }
-      Sidekiq::Client.enqueue(FullScannerWorker, id, host, timeout)
+      Sidekiq::Client.enqueue(FullScannerWorker, id, host, opts)
     end
   end
 end
