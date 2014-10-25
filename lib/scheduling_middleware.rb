@@ -7,12 +7,11 @@ class SchedulingMiddleware
       # If start and end time are 0.0, no scheduling was provided. Start the
       # job.
       if opts["utc_start_test"] == 0.0 && opts["utc_end_test"] == 0.0
-        yield
+        return yield
       end
 
       utc_start_time = decimal_to_utc_time(opts["utc_start_test"])
       utc_end_time = decimal_to_utc_time(opts["utc_end_test"])
-
 
       time_now = Time.now.utc
 
