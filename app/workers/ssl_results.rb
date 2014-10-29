@@ -33,5 +33,3 @@ class SslResults
     port.save!
   end
 end
-
-
