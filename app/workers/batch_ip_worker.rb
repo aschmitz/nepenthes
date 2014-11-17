@@ -94,8 +94,10 @@ class BatchIpWorker
         address_end = NetAddr::CIDR.create(parts.shift.scan(IP_REGEX)[0])
       end
 
-      (address_begin..address_end).each do |address|
-        allAddresses << [address, parts]
+      (address_begin..address_end).each do |cidr|
+        cidr.enumerate.each do |address|
+          allAddresses << [address, parts]
+        end
       end
     end
 
