@@ -95,7 +95,7 @@ class BatchIpWorker
       end
 
       (address_begin..address_end).each do |cidr|
-        cidr.enumerate.each do |address|
+        cidr.enumerate(Objectify:true).each do |address|
           allAddresses << [address, parts]
         end
       end
