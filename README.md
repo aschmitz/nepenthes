@@ -31,7 +31,7 @@ We will install `tendril` first, as `sprout` connects to the scanner. However, y
 
 ## Usage
 * Add a region via http://localhost:3000/regions . The start and end test times must be numbers, and will be used to restrict scans to starting between the given hours (in UTC). Using "0" for each number will allow scans to run at any time. Note that a patch for this functionality is pending, and it does not work at the moment.
-* Go to http://localhost:3000/ip_addresses and add IP addresses. You can use single IP addresses (one per line, don't comma-separate them) or ranges (192.168.1.0 - 192.168.5.255). CIDR support doesn't currently work, but I think that's a matter of changing a regex. If you want to tag all of the ranges you're entering at a time in some way (hosting facility, country, whatever), you can add tags for all of them (space-separated) in the appropriate field. To tag just addresses in a specific range, you can put them space-separated after the range, on the same line. Adding thousands of IP addresses will be a bit slow.
+* Go to http://localhost:3000/ip_addresses and add IP addresses. You can use single IP addresses (one per line, don't comma-separate them), ranges (192.168.1.0 - 192.168.5.255), or CIDR notation (10.0.0.0/24). If you want to tag all of the ranges you're entering at a time in some way (hosting facility, country, whatever), you can add tags for all of them (space-separated) in the appropriate field. To tag just addresses in a specific range, you can put them space-separated after the range, on the same line. Adding thousands of IP addresses will be a bit slow.
 
 ## Scanning
 
