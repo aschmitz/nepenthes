@@ -4,6 +4,21 @@
     <%= label_tag :addresses, 'IP Addresses', :class => 'control-label' %>
     <div class="controls">
       <%= text_area_tag :addresses, '', :class => 'text_area', :rows => 7 %>
+      <div>
+        One address or range per line. Formats:
+        <ul>
+          <li>single_ip [tags]
+          <li>start_ip [-] end_ip [tags]
+          <li>cidr_range [tags]
+        </ul>
+        Examples:
+        <ul>
+          <li>10.0.0.1 tag1 tag2
+          <li>10.0.0.1-10.0.2.255
+          <li>10.0.0.1 - 10.0.2.255
+          <li>10.0.0.1/20
+        </ul>
+      </div>
     </div>
   </div>
   <div class="control-group">
