@@ -8,10 +8,12 @@ class IpAddressesController < ApplicationController
       @ip_addresses = IpAddress
     end
     
-    @ip_addresses = @ip_addresses.order('address').page(params[:page]).per(50)
+    @ip_addresses = @ip_addresses.order('address')
     
     respond_to do |format|
-      format.html # index.html.erb
+      format.html {
+        @ip_addresses = @ip_addresses.page(params[:page]).per(50)
+      }
       format.json { render json: @ip_addresses }
       format.xml {
         response.headers['Content-Type'] = 'text/xml; charset=UTF-8;'
@@ -28,13 +30,14 @@ class IpAddressesController < ApplicationController
   <verbose level="1"/>
   <debugging level="0"/>
         header
-        Scan.where(:processed => true).each do |scan|
+        @ip_addresses.includes(:scans).where(scans: {processed: true}
+            ).map(&:scans).flatten.each do |scan|
           response.stream.write scan.get_host_xml.to_xml
         end
         response.stream.write '</nmaprun>'
         response.stream.close
       }
-      format.text { render text: IpAddress.all.map(&:to_s).join("\n") }
+      format.text { render text: @ip_addresses.map(&:to_s).join("\n") }
     end
   end
   
