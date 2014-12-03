@@ -1,20 +1,22 @@
-<% port = screenshot.screenshotable %>
+<% port = screenshot.screenshotable
+if params[:distinct] == 'true'
+  ports = screenshot.all_ports
+else
+  ports = [screenshot.screenshotable]
+end %>
 <tr>
   <td>
-    <% if params[:distinct] == 'true' %>
-      <%= safe_join(screenshot.all_ips.map(&:to_s), "<br/>".html_safe) %>
-    <% else %>
-    <%= link_to port.ip_address.address_or_hostname, ip_address_path(port.ip_address) %>:<%= link_to port.number, port_path(port.number) %>
-    <% end %>
-  </td>
-  <td>
-    <% if port.ssl == nil %>
-      <a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>
-      <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
-    <% elsif port.ssl == false %>
-      <a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>
-    <% else %>
-      <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>
+    <% ports.each do |port| %>
+      <span style="white-space: nowrap"><%= link_to(port.ip_address.address_or_hostname, ip_address_path(port.ip_address)) %>:<%=link_to(port.number, port_path(port.number))%>
+      <% if port.ssl == nil %>
+        (<a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>
+        <a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>)
+      <% elsif port.ssl == false %>
+        (<a href="http://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">http</a>)
+      <% else %>
+        (<a href="https://<%= "#{port.ip_address.to_s}:#{port.number}" %>" target="_blank">https</a>)
+      <% end %>
+      </span><br>
     <% end %>
   </td>
   <td><%= link_to h(screenshot.final_url), screenshot.final_url %></td>
