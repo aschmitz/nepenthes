@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140716210124) do
+ActiveRecord::Schema.define(version: 20141211183159) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20140716210124) do
   add_index "scans", ["ip_address_id"], name: "index_scans_on_ip_address_id", using: :btree
 
   create_table "screenshots", force: true do |t|
-    t.string   "url"
+    t.text     "url"
     t.binary   "data",                limit: 16777215
     t.integer  "screenshotable_id"
     t.string   "screenshotable_type"
