@@ -32,7 +32,7 @@
     <% end %>
   </td>
   <td>
-    <%= port.extra %>
+    <%= h(port.extra).gsub("\n", "<br>").html_safe %>
     <% unless port.screenshots.where('length(data) > 0').empty?
       ss = port.screenshots.where('length(data) > 0').first %><br>
       <%= link_to (image_tag screenshot_path(ss.id), width: 200, height: 150), ss.url, target: '_blank' %>
