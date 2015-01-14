@@ -37,6 +37,10 @@ class IpAddress < ActiveRecord::Base
   
   def self.queue_full_scans!
     queued = 0
+
+    # Will hold the options passed to the FullScannerWorker
+    opts = {}
+
     scan = self.where(has_full_scan: false).all
     scan.sort! { |a,b|
       a_score = a.pingable? ? 2 : 0
@@ -50,8 +54,12 @@ class IpAddress < ActiveRecord::Base
     
     scan.each do |ip|
       scan = ip.scans.create
-      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
-          ip.ping_duration)
+
+      opts["utc_start_test"] = ip.region.utc_start_test
+      opts["utc_end_test"]   = ip.region.utc_end_test
+      opts["ping_duration"]  = ip.ping_duration
+
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s, opts)
       queued += 1
     end
     
@@ -60,12 +68,18 @@ class IpAddress < ActiveRecord::Base
 
   def self.queue_rescans! timeout
     queued = 0
+    opts = {}
     self.where(full_scan_timed_out: true).each do |ip|
       scan = ip.scans.create
       ip.full_scan_timed_out = false
       ip.save!
-      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s,
-          ip.ping_duration, timeout)
+
+      opts["utc_start_test"] = ip.region.utc_start_test
+      opts["utc_end_test"]   = ip.region.utc_end_test
+      opts["timeout"]        = timeout
+      opts["ping_duration"]  = ip.ping_duration
+
+      Sidekiq::Client.enqueue(FullScannerWorker, scan.id, ip.to_s, opts)
       queued += 1
     end
     # do we want to delete the old scans?

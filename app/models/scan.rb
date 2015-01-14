@@ -9,7 +9,9 @@ class Scan < ActiveRecord::Base
     
     doc = Nokogiri::XML(self.results)
     unless doc.at('host/address/@addr')
-      Sidekiq::Client.enqueue(FullScannerWorker, self.id, self.ip_address.to_s)
+      Sidekiq::Client.enqueue(FullScannerWorker, self.id, self.ip_address.to_s,
+                              { utc_start_test: self.ip_address.region.utc_start_test,
+                                utc_end_test:   self.ip_address.region.utc_end_test }  )
       return
     end
     
