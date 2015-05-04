@@ -20,7 +20,8 @@ else
 fi
 
 PACKAGES="git tmux build-essential libfontconfig1 ruby1.9.1 ruby1.9.1-dev \
-  libsqlite3-dev libxslt1-dev nmap nikto openssh-server"
+  libsqlite3-dev libxslt1-dev nmap nikto openssh-server zlib1g-dev \
+  redis-tools"
 
 UBUNTU_VERSION=`lsb_release -r -s`
 
