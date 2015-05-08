@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150506194817) do
+ActiveRecord::Schema.define(version: 20150508202822) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(version: 20150506194817) do
     t.boolean  "pingable"
     t.float    "ping_duration"
     t.integer  "ports_count",                            default: 0,     null: false
+    t.float    "rand"
   end
 
   add_index "ip_addresses", ["address"], name: "index_ip_addresses_on_address", unique: true, using: :btree

@@ -6,6 +6,7 @@ class IpAddress < ActiveRecord::Base
   attr_accessible :address, :tags
   acts_as_taggable
   store :settings, coder: JSON
+  after_initialize :default_values
   
   default_scope { order(:address) }
 
@@ -43,10 +44,12 @@ class IpAddress < ActiveRecord::Base
 
     scan = self.where(has_full_scan: false).all
     scan.sort! { |a,b|
-      a_score = a.pingable? ? 2 : 0
+      a_score = rand
+      a_score += a.pingable? ? 2 : 0
       a_score += a.hostname.empty? ? 0 : 1
       a_score += a.ports.size.zero? ? 0 : 2 + a.ports.size
-      b_score = b.pingable? ? 2 : 0;
+      b_score = rand
+      b_score += b.pingable? ? 2 : 0;
       b_score += b.hostname.empty? ? 0 : 1;
       b_score += b.ports.size.zero? ? 0 : 2 + b.ports.size
       b_score <=> a_score
@@ -88,21 +91,18 @@ class IpAddress < ActiveRecord::Base
     queued
   end
   
-  def self.queue_quick_scans!
+  def self.queue_quick_scans!(opts = ['-Pn', '-p',
+      '80,443,22,25,21,8080,23,3306,143,53', '-sV', '--version-light'])
     queued = 0
-    scan = self.includes(:scans).where(:scans => {:ip_address_id => nil}).all
     
-    scan.sort! { |a,b|
-      a_score = a.pingable? ? 2 : 0;
-      a_score += a.hostname.to_s.empty? ? 0 : 1;
-      b_score = b.pingable? ? 2 : 0;
-      b_score += b.hostname.to_s.empty? ? 0 : 1;
-      b_score <=> a_score
-    }
-    
-    scan.each do |ip|
-      ip.queue_scan!
-      queued += 1
+    while true
+      ips = self.includes(:scans).where(:scans => {:ip_address_id => nil}).
+        reorder('(IF(ip_addresses.hostname="", 0, 1) + '+
+        'ip_addresses.pingable * 2 + '+
+        'RAND()) DESC').limit(10000).to_a
+      
+      break if ips.length == 0
+      queued += IpAddress.queue_many!(ips, opts)
     end
     
     queued
@@ -118,6 +118,29 @@ class IpAddress < ActiveRecord::Base
     scan = self.scans.new(:options => opts)
     scan.save!
     Sidekiq::Client.enqueue(ScannerWorker, scan.id, self.to_s, opts)
+  end
+  
+  def self.queue_many!(ips, opts = ['-Pn', '-p',
+      '80,443,22,25,21,8080,23,3306,143,53', '-sV', '--version-light'])
+    opts_str = self.connection.quote(opts.to_yaml)
+    
+    sql_prefix = "INSERT INTO `scans` (`created_at`, `updated_at`, "+
+      "`options`, `ip_address_id`) VALUES "
+    val_prefix = "(NOW(), NOW(), #{opts_str}, "
+    val_suffix = ")"
+    sql_parts = []
+    ips.each do |ip|
+      sql_parts << val_prefix + ip.id.to_s + val_suffix
+    end
+    first_id = self.connection.insert(sql_prefix + sql_parts.join(', '))
+    
+    scan_id = first_id
+    ips.each do |ip|
+      Sidekiq::Client.enqueue(ScannerWorker, scan_id, ip.to_s, opts)
+      scan_id += 1
+    end
+    
+    ips.length
   end
   
   def self.not_hostname_checked
@@ -181,5 +204,10 @@ class IpAddress < ActiveRecord::Base
         csv << row
       end
     end
+  end
+
+private
+  def default_values
+    self.rand ||= rand
   end
 end
