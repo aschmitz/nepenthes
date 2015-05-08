@@ -8,44 +8,47 @@ class Scan < ActiveRecord::Base
     return if self.processed
     
     doc = Nokogiri::XML(self.results)
-    unless doc.at('host/address/@addr')
+    unless doc.at('//host/address/@addr')
       Sidekiq::Client.enqueue(FullScannerWorker, self.id, self.ip_address.to_s,
                               { utc_start_test: self.ip_address.region.utc_start_test,
                                 utc_end_test:   self.ip_address.region.utc_end_test }  )
       return
     end
     
-    ip_address = IpAddress.find_by_dotted(doc.at('host/address/@addr').value)
-    empty_ports = []
-    have_ports = false
+    doc.xpath('//host').each do |host|
+      ip_address = IpAddress.find_by_dotted(host.at('address/@addr').value)
+      return unless ip_address
+      empty_ports = []
+      have_ports = false
 
-    timeout = doc.at('//taskend/@extrainfo[contains(., "timed out")]')
-    self.timed_out = !!timeout
-    
-    doc.xpath('//port').each do |port|
-      if port.at('state/@state').value == 'open'
-        portRow = ip_address.ports.find_or_create_by_number(port['portid'])
-        portRow.scan = self
-        if port.at('service/@product')
-          portRow.product = port.at('service/@product').value
-          portRow.tag_list << portRow.product
+      timeout = host.at('//taskend/@extrainfo[contains(., "timed out")]')
+      self.timed_out = !!timeout
+      
+      host.xpath('//port').each do |port|
+        if port.at('state/@state').value == 'open'
+          portRow = ip_address.ports.find_or_create_by_number(port['portid'])
+          portRow.scan = self
+          if port.at('service/@product')
+            portRow.product = port.at('service/@product').value
+            portRow.tag_list << portRow.product
+          end
+          if port.at('service/@version')
+            portRow.version = port.at('service/@version').value
+            portRow.tag_list << portRow.version
+          end
+          if port.at('service/@extrainfo')
+            portRow.extra = port.at('service/@extrainfo').value
+          end
+          portRow.save
+        else
+          empty_ports << port['portid']
         end
-        if port.at('service/@version')
-          portRow.version = port.at('service/@version').value
-          portRow.tag_list << portRow.version
-        end
-        if port.at('service/@extrainfo')
-          portRow.extra = port.at('service/@extrainfo').value
-        end
-        portRow.save
-      else
-        empty_ports << port['portid']
       end
+      
+      ip_address.ports.where(:number => empty_ports).destroy_all
+      self.processed = true
+      self.save
     end
-    
-    ip_address.ports.where(:number => empty_ports).destroy_all
-    self.processed = true
-    self.save
   end
   
   def get_host_xml
@@ -66,5 +69,11 @@ class Scan < ActiveRecord::Base
     end
     
     template.to_xml
+  end
+  
+  def self.load_file_as_scan(filename)
+    results = File.read(filename)
+    scan = Scan.create(results: results)
+    scan.process!
   end
 end
