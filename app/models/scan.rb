@@ -15,16 +15,16 @@ class Scan < ActiveRecord::Base
       return
     end
     
-    doc.xpath('//host').each do |host|
+    have_ports = false
+    doc.xpath('/nmaprun/host').each do |host|
       ip_address = IpAddress.find_by_dotted(host.at('address/@addr').value)
       return unless ip_address
       empty_ports = []
-      have_ports = false
 
       timeout = host.at('//taskend/@extrainfo[contains(., "timed out")]')
       self.timed_out = !!timeout
       
-      host.xpath('//port').each do |port|
+      host.xpath('ports/port').each do |port|
         if port.at('state/@state').value == 'open'
           portRow = ip_address.ports.find_or_create_by_number(port['portid'])
           portRow.scan = self
@@ -40,15 +40,17 @@ class Scan < ActiveRecord::Base
             portRow.extra = port.at('service/@extrainfo').value
           end
           portRow.save
+          have_ports = true
         else
           empty_ports << port['portid']
         end
       end
       
       ip_address.ports.where(:number => empty_ports).destroy_all
-      self.processed = true
-      self.save
     end
+    
+    self.processed = true
+    self.save
   end
   
   def get_host_xml
