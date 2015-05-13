@@ -17,7 +17,7 @@ class ScreenshotResults
     lines = result.split "\n"
     final_url = lines[0]
     encoded_image = lines[1]
-    if result.strip == 'failed' or encoded_image.blank?
+    if final_url.strip == 'failed' or encoded_image.blank?
       # If we failed to take the screenshot, we'll just delete it to avoid
       #  having it show up in other pages.
       screenshot.destroy
