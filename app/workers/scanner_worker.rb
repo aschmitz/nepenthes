@@ -6,7 +6,7 @@ class ScannerWorker
   
   def perform(id, host, opts)
     full_options = ['nmap', '-oX', '-', opts, host].flatten
-    stdout_str, status = Open3.send(:capture2, *full_options)
+    stdout_str, status = Open3.capture2(*full_options)
     if status == 0
       Sidekiq::Client.enqueue(ScannerResults, id, stdout_str, false)
     else
