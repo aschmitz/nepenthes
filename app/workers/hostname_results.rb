@@ -2,10 +2,14 @@ class HostnameResults
   include Sidekiq::Worker
   sidekiq_options :queue => :results
   
-  def perform(id, hostname_data)
-    ip_address = IpAddress.find_by_id(id)
-    return unless ip_address
-    ip_address.hostname = hostname_data
-    ip_address.save!
+  def perform(results)
+    results.each do |result|
+      id, hostname_data = result
+      
+      ip_address = IpAddress.find(id)
+      next unless ip_address
+      ip_address.hostname = hostname_data
+      ip_address.save!
+    end
   end
 end

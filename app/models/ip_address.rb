@@ -32,6 +32,18 @@ class IpAddress < ActiveRecord::Base
     NetAddr::CIDR.create(self.address.to_i).ip
   end
   
+  def queue_full_scan!
+    scan = self.scans.create
+    
+    opts = {
+      "utc_start_test" => self.region.utc_start_test,
+      "utc_end_test"   => self.region.utc_end_test,
+      "ping_duration"  => self.ping_duration
+    }
+    
+    Sidekiq::Client.enqueue(FullScannerWorker, scan.id, self.to_s, opts)
+  end
+  
   def self.find_by_dotted(dotted)
     self.find_by_address(NetAddr::CIDR.create(dotted).to_i(:ip))
   end
@@ -99,7 +111,7 @@ class IpAddress < ActiveRecord::Base
       ips = self.includes(:scans).where(:scans => {:ip_address_id => nil}).
         reorder('(IF(ip_addresses.hostname="", 0, 1) + '+
         'ip_addresses.pingable * 2 + '+
-        'RAND()) DESC').limit(10000).to_a
+        'RAND()) DESC').limit(50000).to_a
       
       break if ips.length == 0
       queued += IpAddress.queue_many!(ips, opts)
@@ -158,7 +170,7 @@ class IpAddress < ActiveRecord::Base
   end
   
   def queue_check_hostname!
-    Sidekiq::Client.enqueue(HostnameWorker, self.id, self.to_s)
+    Sidekiq::Client.enqueue(HostnameWorker, [self.id, self.to_s])
   end
   
   def self.pingable
