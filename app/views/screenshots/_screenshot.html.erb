@@ -39,9 +39,9 @@ end %>
   <td><%= simple_format(h(port.nikto_results)) %></td>
   <td><%= port.done %></td>
   <td>
-    <%= link_to t('.edit', :default => t("helpers.links.edit")),
+    <%= link_to 'Edit',
                 edit_port_path(port), :class => 'btn btn-mini' %>
-    <%= link_to t('.note', :default => t("helpers.links.done")),
+    <%= link_to 'Note',
                 mark_as_done_port_path(port, :todo => params[:todo] ), :class => 'btn btn-mini', :method => :post %>
     <div class='btn btn-mini add-note' onclick="show_notes_dialog(<%= port.id %>)" >Quick Update
       </div>

@@ -10,7 +10,7 @@
       <th><%= model_class.human_attribute_name(:utc_start_test) %></th>
       <th><%= model_class.human_attribute_name(:utc_end_test) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -22,12 +22,12 @@
         <td><%= region.utc_end_test %></td>
         <td><%=l region.created_at %></td>
         <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+          <%= link_to 'Edit',
                       edit_region_path(region), :class => 'btn btn-mini' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+          <%= link_to 'Destroy',
                       region_path(region),
                       :method => :delete,
-                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :data => { :confirm => 'Are you sure?' },
                       :class => 'btn btn-mini btn-danger' %>
         </td>
       </tr>
@@ -35,6 +35,6 @@
   </tbody>
 </table>
 
-<%= link_to t('.new', :default => t("helpers.links.new")),
+<%= link_to 'New',
             new_region_path,
             :class => 'btn btn-primary' %>

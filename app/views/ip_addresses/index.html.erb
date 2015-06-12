@@ -20,7 +20,7 @@
       <th><%= model_class.human_attribute_name(:address) %></th>
       <th>Tags</th>
       <th>Open Ports</th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -38,12 +38,12 @@
           <%= ip_address.ports.count %>
         </td>
         <td>
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+          <%= link_to 'Edit',
                       edit_ip_address_path(ip_address), :class => 'btn btn-mini' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+          <%= link_to 'Destroy',
                       ip_address_path(ip_address),
                       :method => :delete,
-                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :data => { :confirm => 'Are you sure?' },
                       :class => 'btn btn-mini btn-danger' %>
         </td>
       </tr>
