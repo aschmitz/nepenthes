@@ -3,6 +3,7 @@ class IpAddress < ActiveRecord::Base
   belongs_to :tag
   has_many :scans, :dependent => :destroy
   has_many :ports, :dependent => :destroy
+  has_many :nessus_results, :dependent => :delete_all
   attr_accessible :address, :tags
   acts_as_taggable
   store :settings, coder: JSON

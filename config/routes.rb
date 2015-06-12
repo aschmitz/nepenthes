@@ -22,6 +22,8 @@ Nepenthes::Application.routes.draw do
     end
   end
   
+  resources :nessus_plugins, path: 'nessus'
+  
   resources :ports do
     member do
       get 'tagged/:tag', :action => 'show', :as => 'tagged'

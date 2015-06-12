@@ -49,4 +49,7 @@ group :local do
   
   # Unicorn as a server
   gem 'unicorn'
+  
+  # Used for Nessus.
+  gem 'rest-client'
 end

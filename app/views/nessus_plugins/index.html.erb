@@ -1,0 +1,22 @@
+<div class="page-header">
+  <h1>Nessus Results</h1>
+</div>
+
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+      <th>Severity</th>
+      <th>Results</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% NessusPlugin.order(severity: :desc, nessus_results_count: :desc).each do |plugin| %>
+      <tr>
+        <td><%= plugin.severity %></td>
+        <td><%= plugin.nessus_results_count %></td>
+        <td><%= link_to plugin.name, plugin %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

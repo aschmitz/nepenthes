@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511190653) do
+ActiveRecord::Schema.define(version: 20150519195802) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -33,10 +33,30 @@ ActiveRecord::Schema.define(version: 20150511190653) do
     t.float    "ping_duration"
     t.integer  "ports_count",                            default: 0,     null: false
     t.float    "rand"
+    t.boolean  "has_nessus",                             default: false
   end
 
   add_index "ip_addresses", ["address"], name: "index_ip_addresses_on_address", unique: true, using: :btree
   add_index "ip_addresses", ["region_id"], name: "index_ip_addresses_on_region_id", using: :btree
+
+  create_table "nessus_plugins", force: true do |t|
+    t.string   "name"
+    t.integer  "severity"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "nessus_results_count",                    default: 0
+    t.text     "extra",                limit: 2147483647
+  end
+
+  create_table "nessus_results", force: true do |t|
+    t.integer  "ip_address_id"
+    t.integer  "nessus_plugin_id"
+    t.text     "ports"
+    t.text     "output"
+    t.integer  "severity"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "ports", force: true do |t|
     t.integer  "number"
