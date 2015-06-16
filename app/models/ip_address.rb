@@ -171,7 +171,7 @@ class IpAddress < ActiveRecord::Base
   end
   
   def queue_check_hostname!
-    Sidekiq::Client.enqueue(HostnameWorker, [self.id, self.to_s])
+    Sidekiq::Client.enqueue(HostnameWorker, [[self.id, self.to_s]])
   end
   
   def self.pingable
