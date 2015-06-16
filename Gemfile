@@ -20,6 +20,9 @@ gem 'nokogiri'
 # Used for pinging, has to be in both as the frontend still loads workers.
 gem 'net-ping'
 
+# Used for Nessus.
+gem 'rest-client'
+
 group :remote do
   # Needed for the in-memory SQLite stub. Pointless, but easier than patching
   #  ActiveRecord out of everything, or Sidekiq to not load models.
@@ -49,7 +52,4 @@ group :local do
   
   # Unicorn as a server
   gem 'unicorn'
-  
-  # Used for Nessus.
-  gem 'rest-client'
 end
