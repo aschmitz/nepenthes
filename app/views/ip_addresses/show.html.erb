@@ -24,6 +24,30 @@
   No open ports found (yet)!
 <% end %>
 
+<% unless @ip_address.nessus_results.empty? %>
+<h2>Nessus results</h2>
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+      <th>Severity</th>
+      <th>Location</th>
+      <th>Plugin Name</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @ip_address.nessus_results.eager_load(:nessus_plugin).order('nessus_plugins.severity DESC').each do |nessus_result| %>
+    <tr>
+      <td><%= nessus_result.nessus_plugin.severity %></td>
+      <td><%= nessus_result.ports.map{|port, details| h(port)}.join('<br />').html_safe %></td>
+      <td><%= link_to nessus_result.nessus_plugin.name, nessus_result.nessus_plugin %></td>
+      <td><%= simple_format nessus_result.output %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+<% end %>
+
 <div class="form-actions">
   <%= link_to 'Back',
               ip_addresses_path, :class => 'btn'  %>
