@@ -17,6 +17,7 @@
 
 # Ignore generated files.
 /Gemfile.lock
+/system/screenshots
 
 # Ignore private configuration files.
 /config/auth.yml
