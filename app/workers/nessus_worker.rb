@@ -8,66 +8,71 @@ class NessusWorker
   USERNAME = ''
   PASSWORD = ''
   
-  def safe_request(method, path, opts, payload = nil)
+  def safe_request(method, path, payload = nil)
     tries = 0
     begin
       tries += 1
       res = RestClient::Request.execute(
         verify_ssl: OpenSSL::SSL::VERIFY_NONE,
-        headers: opts[:headers],
+        headers: @req_opts[:headers],
         method: method,
-        url: "#{opts[:baseurl]}#{path}",
-        payload: payload)
-    rescue RestClient::RequestTimeout => e
+        url: "#{@req_opts[:baseurl]}#{path}",
+        payload: payload,
+        timeout: 10,
+        open_timeout: 10)
+      if res == nil
+        p "======  Nil!  ======"
+        p [method, path]
+        raise EOFError # So we can retry more cleanly
+      end
+    rescue RestClient::RequestTimeout, EOFError => e
       retry if tries < 5
+    rescue RestClient::Unauthorized => e
+      if tries < 5
+        login
+        retry
+      end
     rescue Exception => e
       p "======  Error!  ======"
       p e.class
       p e
-      p res.body
+      p e.response.body
       throw e
-    end
-    
-    if res == nil
-      p "======  Nil!  ======"
-      p res.body
     end
     
     return res
   end
   
-  def perform(ip_id, base_policy_id)
-    ip = IpAddress.find(ip_id)
-    baseurl = BASEURL
-    username = USERNAME
-    password = PASSWORD
-    req_opts = { baseurl: baseurl }
-    have_policy = false
-    have_scan = false
-    
-    token = JSON.parse(safe_request(:post, "/session", req_opts, {
-        username: username,
-        password: password
+  def login
+    token = JSON.parse(safe_request(:post, "/session", {
+        username: USERNAME,
+        password: PASSWORD,
       }))['token']
-    req_opts[:headers] = {
+    @req_opts[:headers] = {
       'X-Cookie' => "token=#{token}",
       'Content-Type' => 'application/json'
     }
+  end
+  
+  def perform(ip_id, base_policy_id)
+    ip = IpAddress.find(ip_id)
+    @req_opts = { baseurl: BASEURL }
+    have_policy = false
+    have_scan = false
     
     begin
       policy_id = JSON.parse(safe_request(:post,
-        "/policies/#{base_policy_id}/copy", req_opts, ''))['id']
+        "/policies/#{base_policy_id}/copy", ''))['id']
       have_policy = true
       
       # The copy action doesn't return the UUID, so we have to get it separately.
-      policy_copy = JSON.parse(safe_request(:get, "/policies/#{policy_id}",
-        req_opts))
+      policy_copy = JSON.parse(safe_request(:get, "/policies/#{policy_id}"))
       policy_uuid = policy_copy['uuid']
       policy_name = policy_copy['settings']['name']+": Nepenthes Copy for "+
         ip.to_s
       
       # Set the appropriate list of ports
-      safe_request(:put, "/policies/#{policy_id}", req_opts, {
+      safe_request(:put, "/policies/#{policy_id}", {
           uuid: policy_uuid,
           settings: {
             name: policy_name,
@@ -76,7 +81,7 @@ class NessusWorker
         }.to_json)
       
       # Create the scan.
-      scan = JSON.parse(safe_request(:post, '/scans', req_opts, {
+      scan = JSON.parse(safe_request(:post, '/scans', {
           uuid: policy_uuid,
           settings: {
             name: 'Nepenthes Scan: '+ip.to_s,
@@ -91,24 +96,31 @@ class NessusWorker
       # Launch the scan
       scan_id = scan['id']
       launch_results = JSON.parse(safe_request(:post, "/scans/#{scan_id}/launch",
-        req_opts, ''))
+        ''))
       
       # Check for status
       status = 'running'
       
       while ['running', 'processing'].include?(status)
         sleep 10
-        scan = JSON.parse(safe_request(:get, "/scans/#{scan_id}", req_opts))
+        scan = JSON.parse(safe_request(:get, "/scans/#{scan_id}"))
         status = scan['info']['status']
         p status
       end
       
-      host_id = scan['hosts'][0]['host_id']
+      begin
+        host_id = scan['hosts'].detect{|h| h['hostname'] == ip.to_s}['host_id']
+      rescue Exception => e
+        puts scan.inspect
+        throw e
+      end
       plugins = scan['vulnerabilities'].map{|v| v['plugin_id']}
       
       plugins.each do |plugin_id|
         plugin_results = JSON.parse(safe_request(:get,
-          "/scans/#{scan_id}/hosts/#{host_id}/plugins/#{plugin_id}", req_opts))
+          "/scans/#{scan_id}/hosts/#{host_id}/plugins/#{plugin_id}"))
+        
+        next if plugin_results['outputs'].blank?
         
         plugin = NessusPlugin.where(id: plugin_id).first_or_create do |plugin|
           plugin.name = plugin_results['info']['plugindescription']['pluginname']
@@ -117,7 +129,7 @@ class NessusWorker
         plugin.extra = plugin_results['info']['plugindescription']['pluginattributes']
         plugin.save
         
-        ip.nessus_results.where(nessus_plugin_id: plugin_id).delete_all
+        ip.nessus_results.where(nessus_plugin_id: plugin_id).destroy_all
         
         plugin_results['outputs'].each do |output|
           # This should probably look up ports and link them somehow.
@@ -134,12 +146,12 @@ class NessusWorker
     ensure
       if have_scan
         # Delete the scan.
-        safe_request(:delete, "/scans/#{scan_id}", req_opts, '')
+        safe_request(:delete, "/scans/#{scan_id}", '')
       end
       
       if have_policy
         # Delete the policy.
-        safe_request(:delete, "/policies/#{policy_id}", req_opts, '')
+        safe_request(:delete, "/policies/#{policy_id}", '')
       end
     end
   end
