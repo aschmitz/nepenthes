@@ -1,7 +1,71 @@
+<%
+refname_to_human = {
+  'bid' => 'BID',
+  'cve' => 'CVE',
+  'iava' => 'IAVA',
+  'msft' => 'Microsoft',
+  'osvdb' => 'OSVDB',
+}
+refname_to_human.default_proc = proc do |hash, key|
+  hash[key] = key
+end
+%>
+
 <div class="page-header">
   <h1><%= @plugin.name %></h1>
 </div>
 
+<h2>Description</h2>
+<%= simple_format @plugin.extra[:description] %>
+
+<% unless (@plugin.extra[:ref_information].blank? || @plugin.extra[:ref_information][:ref].blank?) && @plugin.extra[:see_also].blank? %>
+<h2>References</h2>
+<ul>
+<% unless @plugin.extra[:ref_information].blank? || @plugin.extra[:ref_information][:ref].blank?
+  @plugin.extra[:ref_information][:ref].each do |ref| %>
+  <li>
+    <%= refname_to_human[ref[:name]] %>:
+    <%= ref[:values][:value].map{|value|
+      if ref[:url]
+        link_to value, ref[:url]+value, target: '_blank'
+      else
+        value
+      end }.join(', ').html_safe %>
+  </li>
+<% end
+end %>
+<% unless @plugin.extra[:see_also].blank? %>
+  <li>See also:<ul>
+    <% @plugin.extra[:see_also].each do |url| %>
+      <li><%= link_to url, url, target: '_blank' %></li>
+    <% end %>
+  </ul></li>
+<% end %>
+</ul>
+<% end %>
+
+<% unless @plugin.extra[:vuln_information].blank? %>
+<h2><%= @plugin.extra[:vuln_information][:exploitability_ease] %></h2>
+<% unless @plugin.extra[:vuln_information][:exploit_frameworks].blank? || @plugin.extra[:vuln_information][:exploit_frameworks][:exploit_framework].blank? %>
+<p>Exploit Frameworks:</p>
+<ul>
+<% @plugin.extra[:vuln_information][:exploit_frameworks][:exploit_framework].each do |framework| %>
+  <li>
+    <%= framework[:name] %>
+    <% unless framework[:exploits].blank? || framework[:exploits][:exploit].blank? %>
+    <ul>
+    <% framework[:exploits][:exploit].each do |exploit| %>
+      <li><%= exploit[:name] %></li>
+    <% end %>
+    </ul>
+    <% end %>
+  </li>
+<% end %>
+</ul>
+<% end %>
+<% end %>
+
+<h2>Locations</h2>
 <table class="table table-striped table-condensed">
   <thead>
     <tr>
@@ -13,11 +77,9 @@
   <tbody>
     <% @plugin.nessus_results.each do |result| %>
     <tr>
-      <td><%= result.ip_address.to_s %></td>
+      <td><%= link_to result.ip_address.address_and_hostname, result.ip_address %></td>
       <td>
-        <% result.ports.each do |port, details| %>
-          <%= port %>
-        <% end %>
+        <%= result.ports.map{|port, details| h(port)}.join('<br />').html_safe %>
       </td>
       <td>
         <%= simple_format result.output %>
