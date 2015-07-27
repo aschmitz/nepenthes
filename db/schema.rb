@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150519195802) do
+ActiveRecord::Schema.define(version: 20150722133207) do
 
   create_table "domains", force: true do |t|
     t.string   "name"
@@ -52,7 +52,7 @@ ActiveRecord::Schema.define(version: 20150519195802) do
     t.integer  "ip_address_id"
     t.integer  "nessus_plugin_id"
     t.text     "ports"
-    t.text     "output"
+    t.text     "output",           limit: 2147483647
     t.integer  "severity"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 20150519195802) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "data_hash"
-    t.string   "final_url"
+    t.text     "final_url"
   end
 
   add_index "screenshots", ["data_hash"], name: "index_screenshots_on_data_hash", using: :btree
