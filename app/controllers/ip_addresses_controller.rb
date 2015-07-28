@@ -175,7 +175,33 @@ class IpAddressesController < ApplicationController
   end
   
   def ranges
-    @ranges = NetAddr.merge(IpAddress.all.map(&:to_s), Objectify: true).sort
+    ranges = NetAddr.merge(IpAddress.all.map(&:to_s), Objectify: true).sort
+    
+    @cidr = ranges.map(&:to_s)
+    
+    # Merge together CIDR ranges that are contiguous. This is beneficial because
+    # sometimes NetAddr will be forced to do weird things if a single address
+    # was removed in the middle of a block. For the split ranges, we can
+    # generally merge several little ranges into one or two larger ones.
+    @split = []
+    have_start = false
+    start = nil
+    ranges.each_with_index do |range, index|
+      start = range.first unless have_start
+      
+      # If this isn't the last range, check to see if the next range contains
+      # the IP address after this range: that is, check to see if they're
+      # contiguous.
+      if index < ranges.length-1 && ranges[index+1].contains?(range.next_ip)
+        # They are, so keep our existing start address, and move to the next
+        # range to see if it ends this contiguous block.
+        have_start = true
+        next
+      end
+      
+      @split << "#{start} - #{range.last}"
+      have_start = false
+    end
   end
 
   private
