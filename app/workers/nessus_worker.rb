@@ -110,35 +110,42 @@ class NessusWorker
       
       begin
         host_id = scan['hosts'].detect{|h| h['hostname'] == ip.to_s}['host_id']
-      rescue Exception => e
-        puts scan.inspect
-        throw e
+      rescue NoMethodError => e
+        # We'll get NoMethodError: undefined method `[]' for nil:NilClass if the
+        # host didn't show up in the Nessus results for some reason. This can
+        # happen when the ports we had aren't open any longer, which might
+        # happen if the host goes down, or is transient for whatever reason. In
+        # this case, we'll just say that we have nessus results and end.
+        host_id = nil
       end
-      plugins = scan['vulnerabilities'].map{|v| v['plugin_id']}
       
-      plugins.each do |plugin_id|
-        plugin_results = JSON.parse(safe_request(:get,
-          "/scans/#{scan_id}/hosts/#{host_id}/plugins/#{plugin_id}"))
+      if host_id != nil
+        plugins = scan['vulnerabilities'].map{|v| v['plugin_id']}
         
-        next if plugin_results['outputs'].blank?
-        
-        plugin = NessusPlugin.where(id: plugin_id).first_or_create do |plugin|
-          plugin.name = plugin_results['info']['plugindescription']['pluginname']
-          plugin.severity = plugin_results['info']['plugindescription']['severity']
-        end
-        plugin.extra = plugin_results['info']['plugindescription']['pluginattributes']
-        plugin.save
-        
-        ip.nessus_results.where(nessus_plugin_id: plugin_id).destroy_all
-        
-        plugin_results['outputs'].each do |output|
-          # This should probably look up ports and link them somehow.
-          result = ip.nessus_results.create(
-            nessus_plugin_id: plugin_id,
-            ports: output['ports'],
-            output: output['plugin_output'],
-            severity: output['severity'],
-          )
+        plugins.each do |plugin_id|
+          plugin_results = JSON.parse(safe_request(:get,
+            "/scans/#{scan_id}/hosts/#{host_id}/plugins/#{plugin_id}"))
+          
+          next if plugin_results['outputs'].blank?
+          
+          plugin = NessusPlugin.where(id: plugin_id).first_or_create do |plugin|
+            plugin.name = plugin_results['info']['plugindescription']['pluginname']
+            plugin.severity = plugin_results['info']['plugindescription']['severity']
+          end
+          plugin.extra = plugin_results['info']['plugindescription']['pluginattributes']
+          plugin.save
+          
+          ip.nessus_results.where(nessus_plugin_id: plugin_id).destroy_all
+          
+          plugin_results['outputs'].each do |output|
+            # This should probably look up ports and link them somehow.
+            result = ip.nessus_results.create(
+              nessus_plugin_id: plugin_id,
+              ports: output['ports'],
+              output: output['plugin_output'],
+              severity: output['severity'],
+            )
+          end
         end
       end
       ip.has_nessus = true
