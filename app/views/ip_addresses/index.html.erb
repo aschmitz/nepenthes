@@ -3,6 +3,10 @@
   <h1>Hosts<%= params[:tag] ? " tagged \"#{params[:tag]}\"" : '' %></h1>
 </div>
 
+<p>You can also view a list of <%= link_to 'tracked IP address ranges',
+ranges_ip_addresses_path %>. Note: this may take a long time to load, depending
+on the number of IP addresses you are tracking.</p>
+
 <%= form_tag search_ip_addresses_path, :class => 'form-horizontal' do %>
   <div class="control-group">
     <%= label_tag :q, 'Search for IP Address', :class => 'control-label' %>

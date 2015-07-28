@@ -1,0 +1,9 @@
+CIDR:
+<% @ranges.each do |range| %>
+<%= range %>
+<% end %>
+
+Split:
+<% @ranges.each do |range| %>
+<%= range.first %> - <%= range.last %>
+<% end %>

@@ -1,0 +1,17 @@
+<div class="page-header">
+  <h1>Tracked IP Addresses</h1>
+</div>
+
+<h2>CIDR</h2>
+<ul>
+<% @ranges.each do |range| %>
+  <li><%= range %></li>
+<% end %>
+</ul>
+
+<h2>Split</h2>
+<ul>
+<% @ranges.each do |range| %>
+  <li><%= range.first %> - <%= range.last %></li>
+<% end %>
+</ul>

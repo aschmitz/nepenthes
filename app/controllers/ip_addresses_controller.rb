@@ -173,6 +173,10 @@ class IpAddressesController < ApplicationController
       @percent_complete = container.pct_complete
     end
   end
+  
+  def ranges
+    @ranges = NetAddr.merge(IpAddress.all.map(&:to_s), Objectify: true).sort
+  end
 
   private
 
