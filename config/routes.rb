@@ -10,7 +10,7 @@ Nepenthes::Application.routes.draw do
   
   resources :domains
   
-  resources :ip_addresses do
+  resources :ip_addresses, id: /[\d\.]+/, path: 'ips' do
     collection do
       get 'batch'
       get 'batch_status'

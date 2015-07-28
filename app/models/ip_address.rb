@@ -33,6 +33,10 @@ class IpAddress < ActiveRecord::Base
     NetAddr::CIDR.create(self.address.to_i).ip
   end
   
+  def to_param
+    to_s
+  end
+  
   def queue_full_scan!
     scan = self.scans.create
     

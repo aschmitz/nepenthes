@@ -1,4 +1,6 @@
 class IpAddressesController < ApplicationController
+  before_filter :load_address, only: [:show, :edit, :update, :destroy]
+  
   # GET /ip_addresses
   # GET /ip_addresses.json
   def index
@@ -53,8 +55,6 @@ class IpAddressesController < ApplicationController
   # GET /ip_addresses/1
   # GET /ip_addresses/1.json
   def show
-    @ip_address = IpAddress.find(params[:id])
-    
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @ip_address }
@@ -74,7 +74,6 @@ class IpAddressesController < ApplicationController
 
   # GET /ip_addresses/1/edit
   def edit
-    @ip_address = IpAddress.find(params[:id])
   end
 
   # POST /ip_addresses
@@ -96,8 +95,6 @@ class IpAddressesController < ApplicationController
   # PUT /ip_addresses/1
   # PUT /ip_addresses/1.json
   def update
-    @ip_address = IpAddress.find(params[:id])
-
     respond_to do |format|
       if @ip_address.update_attributes(params[:ip_address])
         format.html { redirect_to @ip_address, notice: 'Ip address was successfully updated.' }
@@ -112,7 +109,6 @@ class IpAddressesController < ApplicationController
   # DELETE /ip_addresses/1
   # DELETE /ip_addresses/1.json
   def destroy
-    @ip_address = IpAddress.find(params[:id])
     @ip_address.destroy
 
     respond_to do |format|
@@ -182,5 +178,20 @@ class IpAddressesController < ApplicationController
 
     def parse_list(str)
       str && str.split(/[, ]+/).map(&:to_i)
+    end
+    
+    def load_address
+      # Do we have an actual IP address?
+      if params[:id].include?('.')
+        @ip_address = IpAddress.find_by_address(
+          NetAddr::CIDR.create(params[:id]).to_i(:ip))
+      else
+        @ip_address = IpAddress.find_by_id(params[:id])
+      end
+      
+      unless @ip_address
+        flash[:error] = 'Could not find IP address '+params[:id]
+        redirect_to ip_addresses_url
+      end
     end
 end
