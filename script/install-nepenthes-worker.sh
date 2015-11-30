@@ -19,11 +19,18 @@ else
   exit 1
 fi
 
-PACKAGES="git tmux build-essential libfontconfig1 ruby1.9.1 ruby1.9.1-dev \
-  libsqlite3-dev libxslt1-dev nmap nikto openssh-server zlib1g-dev \
-  redis-tools"
+PACKAGES="git tmux build-essential libfontconfig1 libsqlite3-dev libxslt1-dev \
+  nmap nikto openssh-server zlib1g-dev redis-tools"
 
 UBUNTU_VERSION=`lsb_release -r -s`
+
+if [ $UBUNTU_VERSION \< "14.04" ]; then
+  echo -e "\n[*] Using Ubuntu < 14.04, forcing Ruby 1.9.1"
+  PACKAGES="$PACKAGES ruby1.9.1 ruby1.9.1-dev"
+else
+  echo -e "\n[*] Using Ubuntu >= 14.04, using default Ruby"
+  PACKAGES="$PACKAGES ruby ruby-dev"
+fi
 
 if [ $UBUNTU_VERSION \< "12.10" ]; then
   echo -e "\n[*] Using Ubuntu < 12.10, downloading PhantomJS separately."
