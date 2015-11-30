@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'rails', '4.0.1'
+gem 'rails', '~> 4.0.1'
 
 # Rails 4.0 dropped this, we'll put it back for now.
 gem 'protected_attributes'
@@ -31,7 +31,7 @@ end
 
 group :local do
   # We'll just standardize on MySQL.
-  gem 'mysql2'
+  gem 'mysql2', '~> 0.3.10'
   
   # Bootstrap
   gem 'therubyracer'
