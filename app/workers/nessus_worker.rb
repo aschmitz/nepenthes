@@ -145,6 +145,16 @@ class NessusWorker
               output: output['plugin_output'],
               severity: output['severity'],
             )
+            
+            output['ports'].each do |port_name, port_data|
+              if port_data.has_key?('attachments')
+                port_data['attachments'].each do |attachment|
+                  # Attachments have attachment_type ('image/bmp'), key, name,
+                  # and id.
+                  # URL is /scans/:scan_id/attachments/:id?key=:key
+                end
+              end
+            end
           end
         end
       end
