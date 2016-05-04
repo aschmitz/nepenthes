@@ -36,7 +36,7 @@ busy_workers = Sidekiq::Workers.new.size
       Empty
       <% else %>
         <%= pluralize queue_length[queue_name], 'queued job' %>,
-        dating back to <%= time_ago_in_words (queue.latency).ago %> ago.
+        dating back to <%= time_ago_in_words(Time.now - queue.latency.seconds) %> ago.
       <% end %>
     </td>
   </tr>

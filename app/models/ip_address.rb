@@ -59,7 +59,7 @@ class IpAddress < ActiveRecord::Base
     # Will hold the options passed to the FullScannerWorker
     opts = {}
 
-    scan = self.where(has_full_scan: false).all
+    scan = self.where(has_full_scan: false).to_a
     scan.sort! { |a,b|
       a_score = rand
       a_score += a.pingable? ? 2 : 0

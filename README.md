@@ -5,6 +5,8 @@ Nepenthes is an open-source tool for managing network penetration tests, with a 
 ## Install
 The only officially supported way to run Nepenthes is using two (or more) separate Ubuntu VMs. One VM will be dedicated to managing everything (storing the database, handling user requests, etc.), and the remaining VM(s) will be dedicated to scanning. For our purposes, we'll call the manager VM `sprout`, and assume that there is one scanning VM, called `tendril`. Note that the setup instructions for multiple scanning VMs are exactly the same as for the first one, simply repeat the same steps.
 
+Please note: You will be best served by using the most recent LTS version of Ubuntu. Currently, that is 16.04. In particular, some gems required by Nepenthes no longer support Ruby 1.9, which menas Ubuntu 14.04 is no longer usable.
+
 ### Scanner (`tendril`)
 
 We will install `tendril` first, as `sprout` connects to the scanner. However, you can perform `tendril` and `sprout` installation in parallel.

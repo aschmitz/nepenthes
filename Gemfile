@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-gem 'rails', '~> 4.0.1'
+gem 'rails', '~> 4.2.0'
 
 # Rails 4.0 dropped this, we'll put it back for now.
 gem 'protected_attributes'
@@ -7,6 +7,7 @@ gem 'protected_attributes'
 # Remote workers
 gem 'sidekiq'
 gem 'sidekiq_status'
+gem 'redis-namespace'
 gem 'slim'
 # if you require 'sinatra' you get the DSL extended to Object
 gem 'sinatra', '>= 1.3.0', :require => nil
