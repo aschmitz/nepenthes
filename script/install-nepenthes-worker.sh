@@ -42,7 +42,8 @@ fi
 # Yes, this isn't an official source, but we're checking the hashes.
 # Bitbucket (the current official source) seems to block automatic downloads.
 wget -O phantomjs.tar.bz2 \
-  https://github.com/paladox/phantomjs/releases/download/2.1.7/phantomjs-2.1.1-linux-$arch.tar.bz2
+   https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-$arch.tar.bz2
+  #https://github.com/paladox/phantomjs/releases/download/2.1.7/phantomjs-2.1.1-linux-$arch.tar.bz2
 sha256sum phantomjs.tar.bz2 | grep -q $phantomjshash
 if [ $? -ne 0 ]; then
   echo "Unexpected PhantomJS SHA-1 hash. Please try again."
