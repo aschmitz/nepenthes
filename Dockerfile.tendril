@@ -1,0 +1,37 @@
+FROM ubuntu:xenial
+
+RUN sed -i 's|deb-src|# deb-src|g' /etc/apt/sources.list && \
+  echo "mysql-server-5.5 mysql-server/root_password password root" | debconf-set-selections && \
+  echo "mysql-server-5.5 mysql-server/root_password_again password root" | debconf-set-selections && \
+  apt-get update && apt-get install -y --no-install-recommends \
+  tmux \
+  build-essential \
+  libfontconfig1 \
+  libsqlite3-dev \
+  libxslt1-dev \
+  nmap \
+  nikto \
+  openssh-server \
+  zlib1g-dev \
+  redis-tools \
+  ruby \
+  ruby-dev \
+  && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+  && adduser nepenthes --gecos "" --disabled-password
+
+# Install these before we copy all the files so we don't have to re-install all
+# the gems/npm packages if just other files change.
+COPY Gemfile /home/nepenthes/
+RUN cd /home/nepenthes && \
+  gem install --no-rdoc --no-ri bundler && \
+  bundle install --without local
+
+COPY . /home/nepenthes
+RUN cd /home/nepenthes && \
+  cp config/database.yml.example config/database.yml && \
+  chmod 0777 log && \
+  cp config/auth.yml.example config/auth.yml
+
+USER nepenthes
+
+ENTRYPOINT ["/home/nepenthes/script/docker-nepenthes-worker.sh"]
