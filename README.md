@@ -5,13 +5,13 @@ Nepenthes is an open-source tool for managing network penetration tests, with a 
 ## Install
 The only officially supported way to run Nepenthes is using two (or more) separate Ubuntu VMs. One VM will be dedicated to managing everything (storing the database, handling user requests, etc.), and the remaining VM(s) will be dedicated to scanning. For our purposes, we'll call the manager VM `sprout`, and assume that there is one scanning VM, called `tendril`. Note that the setup instructions for multiple scanning VMs are exactly the same as for the first one, simply repeat the same steps.
 
-Please note: You will be best served by using the most recent LTS version of Ubuntu. Currently, that is 16.04. In particular, some gems required by Nepenthes no longer support Ruby 1.9, which menas Ubuntu 14.04 is no longer usable.
+Please note: You will be best served by using the most recent LTS version of Ubuntu. Currently, that is 16.04. In particular, some gems required by Nepenthes no longer support Ruby 1.9, which means Ubuntu 14.04 is no longer usable.
 
 ### Scanner (`tendril`)
 
 We will install `tendril` first, as `sprout` connects to the scanner. However, you can perform `tendril` and `sprout` installation in parallel.
 
-* Install a fresh Ubuntu VM. Ubuntu Server 14.04.1 LTS is a good choice, but other versions should still work.
+* Install a fresh Ubuntu VM. Ubuntu Server 16.04.3 LTS is a good choice, but later versions should still work.
 * On the VM, run the following commands in your user's home directory:
     * `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-worker.sh`
     * `chmod +x install-nepenthes-worker.sh`
@@ -19,7 +19,7 @@ We will install `tendril` first, as `sprout` connects to the scanner. However, y
 
 ### Manager (`sprout`)
 
-* Install a fresh Ubuntu VM. Ubuntu Server 14.04.1 LTS is a good choice, but other versions should still work.
+* Install a fresh Ubuntu VM. Ubuntu Server 16.04.3 LTS is a good choice, but later versions should still work.
 * Note that this server will be installed with a MySQL server with a root password of "root", and should under no circumstances be exposed to the Internet. (This should be changed in Nepenthes soon.)
 * On the VM, run the following commands:
     * `wget https://raw.githubusercontent.com/aschmitz/nepenthes/master/script/install-nepenthes-server.sh`
