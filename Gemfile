@@ -40,7 +40,7 @@ group :local do
   gem 'twitter-bootstrap-rails', '~> 2.2.6'
   
   # Network gems
-  gem 'netaddr'
+  gem 'netaddr', '~> 1.5'
   
   # Pagination
   gem 'kaminari'
