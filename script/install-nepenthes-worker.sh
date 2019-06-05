@@ -88,10 +88,10 @@ chmod 0777 log
 cp config/auth.yml.example config/auth.yml
 
 echo -e "\n[*] Installing Bundler"
-gem install --no-rdoc --no-ri bundler
+gem install --no-rdoc --no-ri bundler -v 1.16.0
 
 echo -e "\n[*] Installing Nepenthes' required gems"
-bundle install --without local
+bundle _1.16.0_ install --without local
 
 echo -e "\n[*] Dropping Nepenthes worker scripts in ~/"
 ln -s `pwd`/script/*worker*.sh ../
