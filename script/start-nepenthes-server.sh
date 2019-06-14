@@ -7,10 +7,10 @@ fi
 
 cd nepenthes
 tmux new-session -s nepenthesserver -n unicorn -d \
-  'unicorn_rails -E production -c config/unicorn.rb'
+  'bundle exec unicorn_rails -E production -c config/unicorn.rb'
 tmux new-window -t nepenthesserver:1 -n results \
-  'sidekiq -e production -c 5 -q results -v'
+  'bundle exec sidekiq -e production -c 5 -q results -v'
 tmux new-window -t nepenthesserver:2 -n batch \
-  'sidekiq -e production -c 1 -q batch -v'
+  'bundle exec sidekiq -e production -c 1 -q batch -v'
 
 echo -e "\n[*] Go to http://`hostname`:8080/ to load Nepenthes."
