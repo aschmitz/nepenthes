@@ -9,8 +9,8 @@ class SslWorker
       raise 'Please install coreutils.'
     end
     ssl_data, status = Open3.capture2($TIMEOUT_PATH, '2', $OPENSSL_PATH,
-      's_client', '-connect', "#{host}:#{port}", '-showcerts')
+      's_client', '-connect', "#{host}:#{port}", '-showcerts', stdin_data: '')
     ssl_data.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace)
-    Sidekiq::Client.enqueue(SslResults, id, ssl_data)
+    Sidekiq::Client.enqueue(SslResults, id, ssl_data, status.exitstatus)
   end
 end
