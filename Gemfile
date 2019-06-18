@@ -27,7 +27,7 @@ gem 'rest-client'
 group :remote do
   # Needed for the in-memory SQLite stub. Pointless, but easier than patching
   #  ActiveRecord out of everything, or Sidekiq to not load models.
-  gem 'sqlite3'
+  gem 'sqlite3', '~> 1.3.0'
 end
 
 group :local do
